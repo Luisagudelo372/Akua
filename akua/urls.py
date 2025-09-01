@@ -17,7 +17,7 @@ Including another URLconf
 # akua/urls.py
 from django.contrib import admin
 from django.urls import path
-from usuarios import views  # importa tus vistas de la app usuarios
+from core import views  # importa tus vistas de la app core
 
 urlpatterns = [
     path('admin/', admin.site.urls),
