@@ -14,7 +14,7 @@ Akua is a tourism web platform designed to help users discover destinations, cul
 1. **Clone Repository**
     ```bash
     git clone https://github.com/Luisagudelo372/Akua.git
-    cd Akua
+    cd akua
     ```
 
 2. **Create & Activate Virtual Environment**
