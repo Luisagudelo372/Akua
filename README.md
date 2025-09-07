@@ -3,7 +3,7 @@
 Akua is a tourism web platform designed to help users discover destinations, cultural events, and local experiences in an organized and interactive way.  
 
 ## Team Members
-- Dorian Guisado  
+- Dorian Alejandro Guisao Ospina 
 - Julian Lara  
 - Luis Alfonso Agudelo  
 - Gina Valencia  
