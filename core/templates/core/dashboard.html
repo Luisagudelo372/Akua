@@ -1,0 +1,7 @@
+{% extends 'core/base.html' %}
+
+
+{% block title %}Dashboard — Akua{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8"><h1 class="text-2xl font-bold mb-4">Dashboard</h1><div class="grid md:grid-cols-3 gap-6"><section class="bg-white border rounded-2xl p-4 shadow-card"><h2 class="font-semibold mb-3">Your Routes</h2><ul class="space-y-2 text-sm">{% for r in routes %}<li class="flex items-center justify-between border rounded-lg p-2"><span>{{ r.origin }} → {{ r.destination }}</span><span class="text-gray-500">{{ r.estimated_time }} h</span></li>{% empty %}<li class="text-gray-500">No routes yet.</li>{% endfor %}</ul></section><section class="md:col-span-2 bg-white border rounded-2xl p-4 shadow-card"><h2 class="font-semibold mb-3">Favorite Places</h2><div class="grid sm:grid-cols-2 gap-4">{% for p in favorites %}<article class="border rounded-2xl p-3"><div class="font-medium">{{ p.name }}</div><div class="text-sm text-gray-500">{{ p.type|title }} • ${{ p.cost }}</div></article>{% empty %}<div class="text-gray-500">No favorites yet.</div>{% endfor %}</div></section></div></div>
+{% endblock %}

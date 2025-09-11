@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% block title %}Login — Akua{% endblock %}
+{% block content %}
+<section class="min-vh-100 d-flex align-items-center justify-content-center bg-gradient-akua">
+  <div class="card shadow-lg rounded-4" style="max-width: 440px; width: 100%;">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+        <span class="navbar-brand-logo"><i class="bi bi-leaf-fill"></i></span>
+        <strong>Akua</strong>
+      </div>
+      <h1 class="h4 fw-bold text-center mb-1">Welcome Back</h1>
+      <p class="text-center text-secondary small mb-4">Sign in to continue your Colombian adventure</p>
+
+      <form method="post" action="{% url 'login' %}" class="vstack gap-3">
+        {% csrf_token %}
+        <div>
+          <label class="form-label small">Email Address</label>
+          <input name="username" class="form-control" placeholder="Enter your email">
+        </div>
+        <div>
+          <label class="form-label small">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Enter your password">
+        </div>
+        <div class="d-flex align-items-center justify-content-between small">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember">
+            <label class="form-check-label" for="remember"> Remember me</label>
+          </div>
+          <a href="#" class="link-light text-decoration-none">Forgot password?</a>
+        </div>
+        <button class="btn btn-akua w-100">Sign In</button>
+        <p class="text-center small text-secondary mb-0">Don't have an account? <a href="{% url 'register' %}">Sign up here</a></p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

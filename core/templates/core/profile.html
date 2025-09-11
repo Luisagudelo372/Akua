@@ -1,0 +1,6 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Profile — Akua{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-8"><h1 class="text-2xl font-bold mb-4">Profile</h1><form class="bg-white border rounded-2xl p-6 shadow-card grid md:grid-cols-2 gap-4"><div><label class="text-sm">First name</label><input class="w-full border rounded-lg px-3 py-2" value="{{ request.user.first_name }}"></div><div><label class="text-sm">Last name</label><input class="w-full border rounded-lg px-3 py-2" value="{{ request.user.last_name }}"></div><div class="md:col-span-2"><label class="text-sm">Email</label><input type="email" class="w-full border rounded-lg px-3 py-2" value="{{ request.user.email }}"></div><label class="md:col-span-2 inline-flex items-center gap-2"><input type="checkbox" class="size-4 rounded border"><span>Allow others to see my email</span></label><label class="md:col-span-2 inline-flex items-center gap-2"><input type="checkbox" class="size-4 rounded border"><span>Get reminded about upcoming trips</span></label><div class="md:col-span-2"><button class="rounded-lg px-4 py-2 text-white bg-akua-orange">Save changes</button></div></form></div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Where to Go — Akua{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Sidebar filters -->
+    <aside class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Filters</h5>
+
+          <label class="form-label small mt-3">Budget per Person (USD)</label>
+          <select class="form-select mb-2">
+            <option>Select budget range</option>
+            <option>$60–90/day</option>
+            <option>$90–150/day</option>
+          </select>
+
+          <label class="form-label small mt-3">Interests</label>
+          <div class="d-flex flex-wrap gap-2">
+            {% for tag in tags %}
+              <span class="badge-chip" data-chip>{{ tag }}</span>
+            {% endfor %}
+          </div>
+
+          <label class="form-label small mt-3">Special Requests</label>
+          <textarea rows="3" class="form-control" placeholder="Any specific preferences or requirements..."></textarea>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Results -->
+    <section class="col-md-9">
+      <h2 class="mb-4">Explore Destinations</h2>
+
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'core/img/stunning-mountain.jpg' %}" class="card-img-top" alt="Mountain">
+            <div class="card-body">
+              <h5 class="card-title">Stunning Mountain</h5>
+              <p class="card-text text-muted">Perfect for hiking and adventure lovers.</p>
+              <button class="btn btn-primary btn-sm">View Details</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'core/img/tropical-beach-paradise.png' %}" class="card-img-top" alt="Beach">
+            <div class="card-body">
+              <h5 class="card-title">Tropical Beach Paradise</h5>
+              <p class="card-text text-muted">Relax under the sun and enjoy the ocean breeze.</p>
+              <button class="btn btn-primary btn-sm">View Details</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Puedes duplicar estas cards para más destinos -->
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Opcional: script para “chips” -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-chip]').forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('active'));
+    });
+  });
+</script>
+
+<style>
+  .badge-chip {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: #f1f1f1;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .badge-chip.active {
+    background: #0d6efd;
+    color: #fff;
+  }
+</style>
+{% endblock %}
