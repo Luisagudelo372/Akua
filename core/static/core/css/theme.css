@@ -1,0 +1,39 @@
+/* Akua Bootstrap Theme */
+:root{
+  --akua-orange:#f97316;
+  --akua-orange-dark:#ea580c;
+  --akua-pink:#ff1e8a;
+}
+
+body{font-feature-settings:'ss01' on,'cv01' on}
+
+.navbar-brand-logo{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:999px;
+  background:linear-gradient(90deg,var(--akua-orange),var(--akua-pink));
+  color:#fff;
+}
+
+.hero{position:relative;min-height:58vh;background-size:cover;background-position:center}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.2))}
+.hero>.hero-inner{position:relative;z-index:2}
+
+.search-pill{background:#fff;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:.5rem}
+.search-pill .divider{width:1px;height:40px;background:#e5e7eb;display:none}
+@media (min-width:768px){.search-pill .divider{display:block}}
+
+.btn-akua{color:#fff;background:var(--akua-orange);border:0}
+.btn-akua:hover{background:var(--akua-orange-dark)}
+
+.badge-chip{
+  border:1px solid #e5e7eb;border-radius:999px;padding:.35rem .7rem;font-weight:500;
+  background:#fff;color:#111827;cursor:pointer;
+}
+.badge-chip.active{background:#111827;color:#fff;border-color:#111827}
+
+.card-ghost{box-shadow:0 8px 28px rgba(0,0,0,.06);border-radius:1rem;border:1px solid #eef1f5}
+.section-slope{background:var(--akua-orange);color:#fff;transform:skewY(-3deg);padding:2.5rem 0;margin-top:-2rem}
+.section-slope>.container{transform:skewY(3deg)}
+
+.bg-gradient-akua{background:linear-gradient(135deg,var(--akua-orange),var(--akua-pink))}
+.rating .bi-star-fill{color:#f59e0b}

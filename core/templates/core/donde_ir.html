@@ -1,0 +1,132 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Where to Go — Akua{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">Planifica tu experiencia con Akua 🌎</h2>
+
+  <form id="aiForm" method="POST">
+    {% csrf_token %}
+
+    <div class="row g-4">
+      <!-- Ciudad -->
+      <div class="col-md-4">
+        <label class="form-label">Ciudad destino</label>
+        <input type="text" name="ciudad" class="form-control" placeholder="Ej. Medellín" required>
+      </div>
+
+      <!-- País -->
+      <div class="col-md-4">
+        <label class="form-label">País</label>
+        <input type="text" name="pais" class="form-control" placeholder="Ej. Colombia" required>
+      </div>
+
+      <!-- Presupuesto -->
+      <div class="col-md-4">
+        <label class="form-label">Presupuesto diario (USD)</label>
+        <select name="presupuesto" class="form-select" required>
+          <option value="">Selecciona un rango</option>
+          <option>$60–90</option>
+          <option>$90–150</option>
+          <option>$150–300</option>
+        </select>
+      </div>
+
+      <!-- Días -->
+      <div class="col-md-4">
+        <label class="form-label">Duración del viaje (días)</label>
+        <input type="number" name="dias" min="1" class="form-control" required>
+      </div>
+
+      <!-- Intereses -->
+      <div class="col-md-8">
+        <label class="form-label">Intereses</label>
+        <div class="d-flex flex-wrap gap-2">
+          {% for tag in tags %}
+            <label class="badge-chip">
+              <input type="checkbox" name="intereses" value="{{ tag }}"> {{ tag }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Tipo de evento -->
+      <div class="col-md-6">
+        <label class="form-label">Tipo de eventos preferidos</label>
+        <select name="evento" class="form-select">
+          <option value="">Selecciona</option>
+          <option>Conciertos</option>
+          <option>Festivales</option>
+          <option>Mercados locales</option>
+          <option>Actividades culturales</option>
+        </select>
+      </div>
+
+      <!-- Barrio -->
+      <div class="col-md-6">
+        <label class="form-label">Zona o barrio de hospedaje</label>
+        <input type="text" name="barrio" class="form-control" placeholder="Ej. El Poblado">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Generar ruta personalizada</button>
+  </form>
+
+  <!-- Contenedor para mostrar la respuesta de la IA -->
+  <div id="aiOutput" class="mt-5"></div>
+</div>
+
+<style>
+  .badge-chip {
+    display: inline-block;
+    background: #f8f9fa;
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .badge-chip:hover {
+    background: #0d6efd;
+    color: white;
+  }
+  .badge-chip input {
+    display: none;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('#aiForm');
+  const output = document.querySelector('#aiOutput');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    output.innerHTML = "<div class='alert alert-secondary'>Generando ruta, por favor espera...</div>";
+
+    const formData = new FormData(form);
+    const response = await fetch("{% url 'generar_ruta_ai' %}", {
+      method: "POST",
+      body: formData,
+      headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    });
+
+    const data = await response.json();
+
+    if (data.respuesta) {
+      output.innerHTML = `
+        <div class='card shadow-sm mt-4'>
+          <div class='card-body'>
+            <h5>Ruta sugerida por Akua</h5>
+            <p>${data.respuesta.replace(/\n/g, '<br>')}</p>
+          </div>
+        </div>`;
+    } else {
+      output.innerHTML = `<div class='alert alert-danger mt-4'>${data.error || 'Error generando la ruta.'}</div>`;
+    }
+  });
+});
+</script>
+{% endblock %}

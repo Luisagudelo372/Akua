@@ -1,0 +1,15 @@
+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
+
+from openai import OpenAI
+
+client = OpenAI(
+  api_key="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"
+)
+
+response = client.responses.create(
+  model="gpt-5-nano",
+  input="write a haiku about ai",
+  store=True,
+)
+
+print(response.output_text);

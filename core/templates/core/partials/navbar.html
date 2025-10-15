@@ -1,0 +1,30 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" style="backdrop-filter: blur(6px)">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
+      <span class="navbar-brand-logo"><i class="bi bi-leaf-fill"></i></span>
+      <strong>Akua</strong>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#akuaNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="akuaNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'donde_ir' %}">Plan Trip</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'reviews' %}">Reviews</a></li>
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+        {% endif %}
+      </ul>
+      <div class="d-flex gap-2">
+        {% if user.is_authenticated %}
+          <a href="{% url 'logout' %}" class="btn btn-outline-secondary rounded-pill">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-secondary rounded-pill">Login</a>
+          <a href="{% url 'register' %}" class="btn btn-akua rounded-pill">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
