@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import UserProfile
+from .forms import UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
@@ -117,6 +120,11 @@ def generar_ruta_ai(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def profile(request):
+    # Si no está autenticado, redirigir al login
+    if not request.user.is_authenticated:
+        messages.info(request, 'Debes iniciar sesión para ver tu perfil.')
+        return redirect('login')
+    
     # Obtener o crear el perfil del usuario
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     

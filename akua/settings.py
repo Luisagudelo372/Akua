@@ -101,4 +101,4 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
-os.environ["PATH"] += os.pathsep + r"C:\Users\doria\Desktop\sqlite-tools-win-x64-3500400"
+os.environ["PATH"] += os.pathsep + r"C:\Users\USUARIO\Downloads\sqlite-tools-win-x64-3500400"
