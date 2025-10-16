@@ -7,10 +7,17 @@ from django.views.decorators.csrf import csrf_exempt
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from .models import UserProfile
+from .forms import UserProfileForm
+from django.contrib import messages
+
+
 
 # Cargar variables desde apikey.env
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'openAI.env')
 load_dotenv(dotenv_path)
+
+
 
 
 def index(request):
@@ -108,3 +115,34 @@ def generar_ruta_ai(request):
         return JsonResponse({"respuesta": resultado})
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+def profile(request):
+    # Obtener o crear el perfil del usuario
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        
+        if form.is_valid():
+            # Guardar el perfil
+            profile = form.save()
+            
+            # Actualizar datos del User (email y nombre)
+            user = request.user
+            user.email = form.cleaned_data.get('email', '')
+            user.first_name = form.cleaned_data.get('first_name', '')
+            user.last_name = form.cleaned_data.get('last_name', '')
+            user.save()
+            
+            messages.success(request, '¡Perfil actualizado exitosamente!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+    else:
+        form = UserProfileForm(instance=profile)
+    
+    context = {
+        'form': form,
+        'profile': profile,
+    }
+    return render(request, 'core/profile.html', context)

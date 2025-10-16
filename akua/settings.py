@@ -25,6 +25,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 STATIC_URL = 'static/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -97,3 +101,4 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
+os.environ["PATH"] += os.pathsep + r"C:\Users\doria\Desktop\sqlite-tools-win-x64-3500400"

@@ -10,3 +10,6 @@ __pycache__/
 openAI.env
 *.env
 .env
+
+env/
+env2/
