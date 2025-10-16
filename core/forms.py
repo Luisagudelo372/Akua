@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, Review, Place
 
 class UserProfileForm(forms.ModelForm):
     # Campo adicional para el email del User
@@ -71,3 +71,36 @@ class UserProfileForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
+
+
+# ============================================
+# FORMS PARA REVIEWS
+# ============================================
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['title', 'place', 'qualification', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Paradise Found in Colombia\'s Caribbean Coast'
+            }),
+            'place': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'qualification': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'Comparte tu experiencia en este lugar...'
+            }),
+        }
+        labels = {
+            'title': 'Título de la Reseña',
+            'place': 'Lugar',
+            'qualification': 'Calificación',
+            'description': 'Tu Experiencia'
+        }

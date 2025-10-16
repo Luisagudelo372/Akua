@@ -10,8 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-from .models import UserProfile
-from .forms import UserProfileForm
+from .models import UserProfile, Place, Review
+from .forms import UserProfileForm, ReviewForm
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from .models import Place
@@ -73,11 +73,16 @@ def profile(request):
 
 
 def reviews(request):
-    data = [
-        ("Paradise Found in Colombia's Caribbean Coast", "Tayrona National Park", "Santa Marta, Magdalena", 5),
-        ("Authentic Coffee Culture Immersion", "Coffee Farm Experience", "Salento, Quindío", 4),
-    ]
-    return render(request, "core/reviews.html", {"reviews": data})
+    """Vista para listar todas las reviews"""
+    reviews_list = Review.objects.select_related(
+        'user', 
+        'place'
+    ).all()
+    
+    context = {
+        'reviews': reviews_list,
+    }
+    return render(request, 'core/reviews_list.html', context)
 
 # Inicializar cliente de OpenAI con la API key del archivo .env
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -174,3 +179,24 @@ def place_detail(request, slug):
         'place': place
     }
     return render(request, 'core/place_detail.html', context)
+
+@login_required
+def write_review(request):
+    """Vista para crear una nueva review"""
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.save()
+            messages.success(request, '¡Tu reseña ha sido publicada exitosamente!')
+            return redirect('reviews')
+        else:
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+    else:
+        form = ReviewForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'core/write_review.html', context)

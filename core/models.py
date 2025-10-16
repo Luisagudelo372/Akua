@@ -206,3 +206,91 @@ class Place(models.Model):
         verbose_name = "Lugar"
         verbose_name_plural = "Lugares"
         ordering = ['-rating_average', 'name']
+
+class Category(models.Model):
+    """Categorías de lugares (Nature, Culture, Adventure, etc.)"""
+    name = models.CharField(max_length=100, verbose_name="Nombre")
+    slug = models.SlugField(unique=True)
+    
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
+class Review(models.Model):
+    """Reseñas de lugares"""
+    QUALIFICATION_CHOICES = [
+        (1, '1 Estrella'),
+        (2, '2 Estrellas'),
+        (3, '3 Estrellas'),
+        (4, '4 Estrellas'),
+        (5, '5 Estrellas'),
+    ]
+    
+    title = models.CharField(
+        max_length=200, 
+        verbose_name="Título de la Reseña"
+    )
+    description = models.TextField(verbose_name="Descripción")
+    qualification = models.IntegerField(
+        choices=QUALIFICATION_CHOICES,
+        verbose_name="Calificación"
+    )
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='reviews',
+        verbose_name="Usuario"
+    )
+    place = models.ForeignKey(
+        Place, 
+        on_delete=models.CASCADE, 
+        related_name='reviews',
+        verbose_name="Lugar"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Reseña"
+        verbose_name_plural = "Reseñas"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"
+    
+    def get_category(self):
+        """Obtiene la categoría del lugar asociado"""
+        return self.place.category if self.place else None
+    
+    def get_time_ago(self):
+        """Retorna hace cuánto tiempo se creó la review"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        now = timezone.now()
+        diff = now - self.created_at
+        
+        if diff < timedelta(minutes=1):
+            return "just now"
+        elif diff < timedelta(hours=1):
+            minutes = diff.seconds // 60
+            return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+        elif diff < timedelta(days=1):
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours != 1 else ''} ago"
+        elif diff < timedelta(days=7):
+            return f"{diff.days} day{'s' if diff.days != 1 else ''} ago"
+        elif diff < timedelta(days=30):
+            weeks = diff.days // 7
+            return f"{weeks} week{'s' if weeks != 1 else ''} ago"
+        elif diff < timedelta(days=365):
+            months = diff.days // 30
+            return f"{months} month{'s' if months != 1 else ''} ago"
+        else:
+            years = diff.days // 365
+            return f"{years} year{'s' if years != 1 else ''} ago"

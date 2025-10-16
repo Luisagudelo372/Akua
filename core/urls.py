@@ -11,6 +11,7 @@ urlpatterns = [
     path('donde-ir/', views.donde_ir, name='donde_ir'),
     path('profile/', views.profile, name='profile'),
     path('reviews/', views.reviews, name='reviews'),
+    path('reviews/write/', views.write_review, name='write_review'),
     path("generar_ruta_ai/", views.generar_ruta_ai, name="generar_ruta_ai"),
     path('places/', views.places, name='places'),
     path('places/<slug:slug>/', views.place_detail, name='place_detail'),
