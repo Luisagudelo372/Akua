@@ -2,6 +2,7 @@ from django.db import models
 import pickle
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.text import slugify
 
 class TripItem(models.Model):
     PLACE_TYPES = [
@@ -113,3 +114,95 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = "Perfil de Usuario"
         verbose_name_plural = "Perfiles de Usuarios"
+
+
+
+class Place(models.Model):
+    # ID como Primary Key (auto-incremental)
+    id = models.AutoField(primary_key=True)
+    
+    # Nombre del lugar
+    name = models.CharField(
+        max_length=200,
+        unique=True,
+        verbose_name="Nombre del Lugar"
+    )
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
+    
+    # Foto principal
+    photo = models.ImageField(
+        upload_to='places_photos/',
+        verbose_name="Foto Principal",
+        blank=True,
+        null=True
+    )
+    
+    # Descripción
+    short_description = models.CharField(
+        max_length=200,
+        verbose_name="Descripción Breve",
+        help_text="Descripción corta para las tarjetas"
+    )
+    
+    # Información del modelo de la imagen
+    events = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name="Eventos",
+        help_text="Eventos disponibles en el lugar"
+    )
+    
+    restaurants = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name="Restaurantes",
+        help_text="Restaurantes recomendados"
+    )
+    
+    hotels = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name="Hoteles",
+        help_text="Hoteles cercanos"
+    )
+    
+    estimated_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        verbose_name="Costo Estimado"
+    )
+    
+    category = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Categoría",
+        help_text="Ej: Playa, Montaña, Cultural"
+    )
+    
+    rating_average = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=0.00,
+        verbose_name="Calificación Promedio"
+    )
+    
+    # Campos adicionales útiles
+    city = models.CharField(max_length=100, blank=True, verbose_name="Ciudad")
+    department = models.CharField(max_length=100, blank=True, verbose_name="Departamento")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Lugar"
+        verbose_name_plural = "Lugares"
+        ordering = ['-rating_average', 'name']

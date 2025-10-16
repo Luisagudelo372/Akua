@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 from .models import UserProfile
 from .forms import UserProfileForm
 from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
+from .models import Place
 
 
 
@@ -154,3 +156,21 @@ def profile(request):
         'profile': profile,
     }
     return render(request, 'core/profile.html', context)
+
+def places(request):
+    """Vista de listado de lugares"""
+    places_list = Place.objects.all()
+    
+    context = {
+        'places': places_list
+    }
+    return render(request, 'core/places.html', context)
+
+def place_detail(request, slug):
+    """Vista de detalle de un lugar específico"""
+    place = get_object_or_404(Place, slug=slug)
+    
+    context = {
+        'place': place
+    }
+    return render(request, 'core/place_detail.html', context)

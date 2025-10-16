@@ -12,6 +12,7 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'donde_ir' %}">Plan Trip</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'places' %}">Places</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'reviews' %}">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
         {% if user.is_authenticated %}
