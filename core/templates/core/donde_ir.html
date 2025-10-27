@@ -4,95 +4,317 @@
 {% block title %}Where to Go — Akua{% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
+<div class="bg-white border-bottom shadow-sm">
+  <div class="container py-5">
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-bold mb-3" style="
+        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      ">
+        <i class="bi bi-compass-fill me-2"></i>Planifica tu experiencia con Akua
+      </h1>
+      <p class="lead text-muted">Déjanos ayudarte a crear el viaje perfecto a tu medida</p>
+    </div>
+  </div>
+</div>
+
 <div class="container my-5">
-  <h2 class="mb-4">Planifica tu experiencia con Akua 🌎</h2>
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Formulario -->
+      <div class="card border-0 shadow-sm" style="border-top: 4px solid #F06B43 !important;">
+        <div class="card-body p-4">
+          <form id="aiForm" method="POST">
+            {% csrf_token %}
 
-  <form id="aiForm" method="POST">
-    {% csrf_token %}
+            <!-- Destino -->
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 107, 67, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F04D43, #F06B43);
+                  color: white;
+                ">
+                  <i class="bi bi-geo-alt-fill"></i>
+                </span>
+                Destino
+              </h5>
 
-    <div class="row g-4">
-      <!-- Ciudad -->
-      <div class="col-md-4">
-        <label class="form-label">Ciudad destino</label>
-        <input type="text" name="ciudad" class="form-control" placeholder="Ej. Medellín" required>
-      </div>
+              <div class="row g-3">
+                <!-- Ciudad -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    Ciudad destino
+                    <span style="color: #F04388;">*</span>
+                  </label>
+                  <input type="text" name="ciudad" class="form-control" 
+                         placeholder="Ej. Medellín" required
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                </div>
 
-      <!-- País -->
-      <div class="col-md-4">
-        <label class="form-label">País</label>
-        <input type="text" name="pais" class="form-control" placeholder="Ej. Colombia" required>
-      </div>
+                <!-- País -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    País
+                    <span style="color: #F04388;">*</span>
+                  </label>
+                  <input type="text" name="pais" class="form-control" 
+                         placeholder="Ej. Colombia" required
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                </div>
+              </div>
+            </div>
 
-      <!-- Presupuesto -->
-      <div class="col-md-4">
-        <label class="form-label">Presupuesto diario (USD)</label>
-        <select name="presupuesto" class="form-select" required>
-          <option value="">Selecciona un rango</option>
-          <option>$60–90</option>
-          <option>$90–150</option>
-          <option>$150–300</option>
-        </select>
-      </div>
+            <!-- Presupuesto y Duración -->
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 138, 67, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F08A43, #F0A843);
+                  color: white;
+                ">
+                  <i class="bi bi-wallet2"></i>
+                </span>
+                Presupuesto y Duración
+              </h5>
 
-      <!-- Días -->
-      <div class="col-md-4">
-        <label class="form-label">Duración del viaje (días)</label>
-        <input type="number" name="dias" min="1" class="form-control" required>
-      </div>
+              <div class="row g-3">
+                <!-- Presupuesto -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    Presupuesto diario (USD)
+                    <span style="color: #F04388;">*</span>
+                  </label>
+                  <select name="presupuesto" class="form-select" required
+                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                    <option value="">Selecciona un rango</option>
+                    <option>$60–90</option>
+                    <option>$90–150</option>
+                    <option>$150–300</option>
+                  </select>
+                  <div class="form-text">
+                    <i class="bi bi-info-circle" style="color: #F0A843;"></i>
+                    Incluye hospedaje, comida y actividades
+                  </div>
+                </div>
 
-      <!-- Intereses -->
-      <div class="col-md-8">
-        <label class="form-label">Intereses</label>
-        <div class="d-flex flex-wrap gap-2">
-          {% for tag in tags %}
-            <label class="badge-chip">
-              <input type="checkbox" name="intereses" value="{{ tag }}"> {{ tag }}
-            </label>
-          {% endfor %}
+                <!-- Días -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    Duración del viaje (días)
+                    <span style="color: #F04388;">*</span>
+                  </label>
+                  <input type="number" name="dias" min="1" class="form-control" required
+                         placeholder="Ej. 5"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                  <div class="form-text">
+                    <i class="bi bi-calendar-check" style="color: #F0A843;"></i>
+                    ¿Cuántos días tienes planeado viajar?
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Intereses -->
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 67, 136, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F04388, #F04D43);
+                  color: white;
+                ">
+                  <i class="bi bi-heart-fill"></i>
+                </span>
+                Intereses
+              </h5>
+
+              <div class="d-flex flex-wrap gap-2">
+                {% for tag in tags %}
+                  <label class="badge-chip">
+                    <input type="checkbox" name="intereses" value="{{ tag }}"> 
+                    <i class="bi bi-check-circle-fill me-1"></i>{{ tag }}
+                  </label>
+                {% endfor %}
+              </div>
+              <div class="form-text mt-2">
+                <i class="bi bi-lightbulb" style="color: #F04388;"></i>
+                Selecciona los temas que más te interesan
+              </div>
+            </div>
+
+            <!-- Preferencias Adicionales -->
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 169, 147, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F0A993, #F08A43);
+                  color: white;
+                ">
+                  <i class="bi bi-sliders"></i>
+                </span>
+                Preferencias Adicionales
+              </h5>
+
+              <div class="row g-3">
+                <!-- Tipo de evento -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    Tipo de eventos preferidos
+                  </label>
+                  <select name="evento" class="form-select"
+                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                    <option value="">Selecciona</option>
+                    <option>Conciertos</option>
+                    <option>Festivales</option>
+                    <option>Mercados locales</option>
+                    <option>Actividades culturales</option>
+                  </select>
+                </div>
+
+                <!-- Barrio -->
+                <div class="col-md-6">
+                  <label class="form-label fw-medium" style="color: #495057;">
+                    Zona o barrio de hospedaje
+                  </label>
+                  <input type="text" name="barrio" class="form-control" 
+                         placeholder="Ej. El Poblado"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón -->
+            <div class="d-flex justify-content-center mt-4">
+              <button type="submit" class="btn btn-akua rounded-pill px-5 py-3 shadow-sm" style="
+                font-size: 1.1rem;
+              ">
+                <i class="bi bi-magic me-2"></i>Generar ruta personalizada
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      <!-- Tipo de evento -->
-      <div class="col-md-6">
-        <label class="form-label">Tipo de eventos preferidos</label>
-        <select name="evento" class="form-select">
-          <option value="">Selecciona</option>
-          <option>Conciertos</option>
-          <option>Festivales</option>
-          <option>Mercados locales</option>
-          <option>Actividades culturales</option>
-        </select>
-      </div>
-
-      <!-- Barrio -->
-      <div class="col-md-6">
-        <label class="form-label">Zona o barrio de hospedaje</label>
-        <input type="text" name="barrio" class="form-control" placeholder="Ej. El Poblado">
-      </div>
+      <!-- Contenedor para mostrar la respuesta de la IA -->
+      <div id="aiOutput" class="mt-4"></div>
     </div>
-
-    <button type="submit" class="btn btn-primary mt-4">Generar ruta personalizada</button>
-  </form>
-
-  <!-- Contenedor para mostrar la respuesta de la IA -->
-  <div id="aiOutput" class="mt-5"></div>
+  </div>
 </div>
 
 <style>
+  /* Badge chips para intereses */
   .badge-chip {
-    display: inline-block;
-    background: #f8f9fa;
-    border-radius: 20px;
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    padding: 10px 18px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #6c757d;
+    user-select: none;
   }
+
   .badge-chip:hover {
-    background: #0d6efd;
-    color: white;
+    background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 107, 67, 0.1));
+    border-color: #F06B43;
+    color: #F04D43;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(240, 107, 67, 0.15);
   }
+
   .badge-chip input {
     display: none;
+  }
+
+  .badge-chip input:checked + i {
+    display: inline;
+  }
+
+  .badge-chip i {
+    display: none;
+    color: #F06B43;
+  }
+
+  .badge-chip:has(input:checked) {
+    background: linear-gradient(135deg, #F04D43, #F06B43);
+    border-color: #F04D43;
+    color: white;
+  }
+
+  .badge-chip:has(input:checked) i {
+    color: white;
+  }
+
+  /* Focus states para inputs */
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #F06B43 !important;
+    box-shadow: 0 0 0 0.2rem rgba(240, 107, 67, 0.15) !important;
+  }
+
+  /* Animación del botón */
+  .btn-akua {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-akua::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-akua:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Estilos para el output de la IA */
+  #aiOutput .card {
+    border: none;
+    border-left: 4px solid #F06B43 !important;
+    animation: slideIn 0.5s ease;
+  }
+
+  #aiOutput .card-body h5 {
+    background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  #aiOutput .alert-secondary {
+    background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
+    border-left: 4px solid #F06B43;
+    color: #6c757d;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
@@ -104,7 +326,17 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    output.innerHTML = "<div class='alert alert-secondary'>Generando ruta, por favor espera...</div>";
+    output.innerHTML = `
+      <div class='alert alert-secondary border-0 shadow-sm d-flex align-items-center' style='border-left: 4px solid #F06B43 !important;'>
+        <div class="spinner-border text-primary me-3" role="status" style="color: #F06B43 !important;">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <div>
+          <strong>Generando tu ruta personalizada...</strong>
+          <p class="mb-0 small text-muted">Esto puede tomar unos segundos</p>
+        </div>
+      </div>
+    `;
 
     const formData = new FormData(form);
     const response = await fetch("{% url 'generar_ruta_ai' %}", {
@@ -117,14 +349,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data.respuesta) {
       output.innerHTML = `
-        <div class='card shadow-sm mt-4'>
-          <div class='card-body'>
-            <h5>Ruta sugerida por Akua</h5>
-            <p>${data.respuesta.replace(/\n/g, '<br>')}</p>
+        <div class='card shadow-sm border-0' style='border-left: 4px solid #F06B43 !important;'>
+          <div class='card-body p-4'>
+            <div class="d-flex align-items-center mb-3">
+              <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(135deg, #F04D43, #F06B43);
+                color: white;
+              ">
+                <i class="bi bi-map-fill"></i>
+              </span>
+              <h5 class="fw-bold mb-0">Ruta sugerida por Akua</h5>
+            </div>
+            <div style="line-height: 1.8; color: #495057;">
+              ${data.respuesta.replace(/\n/g, '<br>')}
+            </div>
           </div>
-        </div>`;
+        </div>
+      `;
     } else {
-      output.innerHTML = `<div class='alert alert-danger mt-4'>${data.error || 'Error generando la ruta.'}</div>`;
+      output.innerHTML = `
+        <div class='alert alert-danger border-0 shadow-sm' style='border-left: 4px solid #F04388 !important;'>
+          <i class="bi bi-exclamation-triangle-fill me-2" style="color: #F04388;"></i>
+          <strong>Error:</strong> ${data.error || 'Error generando la ruta. Por favor intenta de nuevo.'}
+        </div>
+      `;
     }
   });
 });

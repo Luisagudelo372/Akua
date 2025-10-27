@@ -5,34 +5,50 @@
 
 {% block content %}
 <!-- Hero Section con Foto -->
-<div class="position-relative" style="height: 400px; overflow: hidden;">
+<div class="position-relative" style="height: 450px; overflow: hidden;">
   {% if place.photo %}
   <img src="{{ place.photo.url }}" alt="{{ place.name }}" 
        class="w-100 h-100" style="object-fit: cover;">
   {% else %}
-  <div class="bg-light w-100 h-100 d-flex align-items-center justify-content-center">
-    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+  <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="
+    background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 138, 67, 0.1));
+  ">
+    <i class="bi bi-image" style="font-size: 5rem; color: #F06B43;"></i>
   </div>
   {% endif %}
   
+  <!-- Overlay con gradiente de marca -->
   <div class="position-absolute top-0 start-0 w-100 h-100" 
-       style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));"></div>
+       style="background: linear-gradient(to bottom, rgba(240, 77, 67, 0.2), rgba(240, 107, 67, 0.7));"></div>
   
   <div class="position-absolute bottom-0 start-0 w-100 p-4 text-white">
     <div class="container">
       <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-2">
-          <li class="breadcrumb-item"><a href="{% url 'places' %}" class="text-white">Lugares</a></li>
-          <li class="breadcrumb-item active text-white" aria-current="page">{{ place.name }}</li>
+        <ol class="breadcrumb mb-3">
+          <li class="breadcrumb-item">
+            <a href="{% url 'places' %}" class="text-white text-decoration-none" style="opacity: 0.9;">
+              <i class="bi bi-house-fill me-1"></i>Lugares
+            </a>
+          </li>
+          <li class="breadcrumb-item active text-white fw-semibold" aria-current="page">
+            {{ place.name }}
+          </li>
         </ol>
       </nav>
-      <h1 class="display-4 fw-bold mb-2">{{ place.name }}</h1>
+      <h1 class="display-4 fw-bold mb-3 text-shadow">{{ place.name }}</h1>
       {% if place.city or place.department %}
-      <p class="lead mb-0">
-        <i class="bi bi-pin-map-fill"></i>
-        {% if place.city %}{{ place.city }}{% endif %}
-        {% if place.city and place.department %}, {% endif %}
-        {% if place.department %}{{ place.department }}{% endif %}
+      <p class="lead mb-0 d-flex align-items-center">
+        <span class="badge px-3 py-2" style="
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
+          font-size: 1rem;
+          font-weight: 500;
+        ">
+          <i class="bi bi-pin-map-fill me-2"></i>
+          {% if place.city %}{{ place.city }}{% endif %}
+          {% if place.city and place.department %}, {% endif %}
+          {% if place.department %}{{ place.department }}{% endif %}
+        </span>
       </p>
       {% endif %}
     </div>
@@ -45,51 +61,85 @@
     <!-- Columna Principal -->
     <div class="col-lg-8">
       <!-- Descripción -->
-      <div class="card border-0 shadow-sm mb-4">
+      <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #F06B43 !important;">
         <div class="card-body p-4">
-          <h3 class="fw-bold mb-3">
-            <i class="bi bi-info-circle-fill text-primary me-2"></i>
+          <h3 class="fw-bold mb-4 d-flex align-items-center">
+            <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 48px;
+              height: 48px;
+              background: linear-gradient(135deg, #F04D43, #F06B43);
+              color: white;
+            ">
+              <i class="bi bi-info-circle-fill"></i>
+            </span>
             Sobre este lugar
           </h3>
-          <p class="lead text-muted">{{ place.short_description }}</p>
+          <p class="lead text-muted mb-0" style="line-height: 1.8;">{{ place.short_description }}</p>
         </div>
       </div>
 
       <!-- Eventos -->
       {% if place.events %}
-      <div class="card border-0 shadow-sm mb-4">
+      <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #F0A843 !important;">
         <div class="card-body p-4">
-          <h4 class="fw-bold mb-3">
-            <i class="bi bi-calendar-event-fill text-success me-2"></i>
+          <h4 class="fw-bold mb-4 d-flex align-items-center">
+            <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 44px;
+              height: 44px;
+              background: linear-gradient(135deg, #F08A43, #F0A843);
+              color: white;
+            ">
+              <i class="bi bi-calendar-event-fill"></i>
+            </span>
             Eventos
           </h4>
-          <p class="mb-0">{{ place.events }}</p>
+          <div class="p-3 rounded-3" style="background-color: rgba(240, 168, 67, 0.05);">
+            <p class="mb-0 text-secondary" style="line-height: 1.8;">{{ place.events }}</p>
+          </div>
         </div>
       </div>
       {% endif %}
 
       <!-- Restaurantes -->
       {% if place.restaurants %}
-      <div class="card border-0 shadow-sm mb-4">
+      <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #F04388 !important;">
         <div class="card-body p-4">
-          <h4 class="fw-bold mb-3">
-            <i class="bi bi-shop-window text-danger me-2"></i>
+          <h4 class="fw-bold mb-4 d-flex align-items-center">
+            <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 44px;
+              height: 44px;
+              background: linear-gradient(135deg, #F04388, #F04D43);
+              color: white;
+            ">
+              <i class="bi bi-shop-window"></i>
+            </span>
             Restaurantes Recomendados
           </h4>
-          <p class="mb-0">{{ place.restaurants }}</p>
+          <div class="p-3 rounded-3" style="background-color: rgba(240, 67, 136, 0.05);">
+            <p class="mb-0 text-secondary" style="line-height: 1.8;">{{ place.restaurants }}</p>
+          </div>
         </div>
       </div>
       {% endif %}
 
       <!-- Hoteles -->
       {% if place.hotels %}
-      <div class="card border-0 shadow-sm mb-4">
+      <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #F0A993 !important;">
         <div class="card-body p-4">
-          <h4 class="fw-bold mb-3">
-            <i class="bi bi-building text-info me-2"></i>
+          <h4 class="fw-bold mb-4 d-flex align-items-center">
+            <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 44px;
+              height: 44px;
+              background: linear-gradient(135deg, #F0A993, #F08A43);
+              color: white;
+            ">
+              <i class="bi bi-building"></i>
+            </span>
             Dónde Hospedarse
           </h4>
-          <p class="mb-0">{{ place.hotels }}</p>
+          <div class="p-3 rounded-3" style="background-color: rgba(240, 169, 147, 0.05);">
+            <p class="mb-0 text-secondary" style="line-height: 1.8;">{{ place.hotels }}</p>
+          </div>
         </div>
       </div>
       {% endif %}
@@ -98,55 +148,98 @@
     <!-- Sidebar -->
     <div class="col-lg-4">
       <!-- Info Rápida -->
-      <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 100px;">
+      <div class="card border-0 shadow-sm mb-4 sticky-top" style="
+        top: 100px;
+        border-top: 4px solid #F06B43 !important;
+      ">
         <div class="card-body p-4">
-          <h5 class="fw-bold mb-4">Información del Viaje</h5>
+          <h5 class="fw-bold mb-4" style="
+            color: #F04D43;
+            font-size: 1.3rem;
+          ">
+            <i class="bi bi-info-square-fill me-2"></i>Información del Viaje
+          </h5>
           
           <!-- Rating -->
           {% if place.rating_average > 0 %}
           <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-            <span class="text-muted">
-              <i class="bi bi-star-fill text-warning"></i> Calificación
+            <span class="text-muted d-flex align-items-center">
+              <i class="bi bi-star-fill me-2" style="color: #F0A843;"></i> 
+              <span class="fw-medium">Calificación</span>
             </span>
-            <span class="fw-bold fs-5">{{ place.rating_average }}/5.0</span>
+            <span class="badge px-3 py-2" style="
+              background: linear-gradient(135deg, #F0A843, #F08A43);
+              font-size: 1rem;
+            ">
+              {{ place.rating_average }}/5.0
+            </span>
           </div>
           {% endif %}
 
           <!-- Costo -->
           {% if place.estimated_cost > 0 %}
           <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-            <span class="text-muted">
-              <i class="bi bi-cash-coin text-success"></i> Costo Estimado
+            <span class="text-muted d-flex align-items-center">
+              <i class="bi bi-cash-coin me-2" style="color: #F04D43;"></i>
+              <span class="fw-medium">Costo Estimado</span>
             </span>
-            <span class="fw-bold text-success">${{ place.estimated_cost|floatformat:0 }}</span>
+            <span class="fw-bold" style="
+              color: #F04D43;
+              font-size: 1.2rem;
+            ">
+              ${{ place.estimated_cost|floatformat:0 }}
+            </span>
           </div>
           {% endif %}
 
           <!-- Categoría -->
           {% if place.category %}
-          <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-            <span class="text-muted">
-              <i class="bi bi-tag"></i> Categoría
+          <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <span class="text-muted d-flex align-items-center">
+              <i class="bi bi-tag-fill me-2" style="color: #F06B43;"></i>
+              <span class="fw-medium">Categoría</span>
             </span>
-            <span class="badge bg-light text-dark border">{{ place.category }}</span>
+            <span class="badge px-3 py-2 border" style="
+              background-color: rgba(240, 107, 67, 0.1);
+              color: #F04D43;
+              border-color: rgba(240, 107, 67, 0.3) !important;
+            ">
+              {{ place.category }}
+            </span>
           </div>
           {% endif %}
 
           <!-- Botones de Acción -->
-          <div class="d-grid gap-2 mt-4">
+          <div class="d-grid gap-3 mt-4">
             {% if user.is_authenticated %}
-            <a href="{% url 'donde_ir' %}" class="btn btn-akua">
-              <i class="bi bi-map"></i> Planear Viaje
+            <a href="{% url 'donde_ir' %}" class="btn btn-akua rounded-pill py-3 shadow-sm" style="
+              font-weight: 600;
+              font-size: 1rem;
+            ">
+              <i class="bi bi-map-fill me-2"></i> Planear Viaje
             </a>
             {% else %}
-            <a href="{% url 'login' %}" class="btn btn-akua">
-              <i class="bi bi-box-arrow-in-right"></i> Inicia sesión para planear
+            <a href="{% url 'login' %}" class="btn btn-akua rounded-pill py-3 shadow-sm" style="
+              font-weight: 600;
+              font-size: 1rem;
+            ">
+              <i class="bi bi-box-arrow-in-right me-2"></i> Inicia sesión para planear
             </a>
             {% endif %}
             
-            <a href="{% url 'places' %}" class="btn btn-outline-secondary">
-              <i class="bi bi-arrow-left"></i> Volver a Lugares
+            <a href="{% url 'places' %}" class="btn btn-outline-secondary rounded-pill py-2">
+              <i class="bi bi-arrow-left me-2"></i> Volver a Lugares
             </a>
+          </div>
+
+          <!-- Info adicional -->
+          <div class="mt-4 p-3 rounded-3" style="
+            background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
+          ">
+            <p class="small text-muted mb-0 text-center">
+              <i class="bi bi-lightbulb-fill" style="color: #F0A843;"></i>
+              ¿Necesitas ayuda? Contáctanos para planear tu viaje perfecto
+            </p>
           </div>
         </div>
       </div>
@@ -155,19 +248,35 @@
 </div>
 
 <style>
-  .btn-akua {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-  }
-  
-  .btn-akua:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #63408a 100%);
-    color: white;
-  }
-  
   .breadcrumb-item + .breadcrumb-item::before {
     color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Hover para botón outline */
+  .btn-outline-secondary {
+    border-color: #F06B43;
+    color: #F06B43;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #F06B43;
+    border-color: #F06B43;
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  /* Animación suave para las cards */
+  .card {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateX(5px);
   }
 </style>
 {% endblock %}

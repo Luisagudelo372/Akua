@@ -4,14 +4,37 @@
 {% block title %}Lugares - Akua{% endblock %}
 
 {% block content %}
-<div class="bg-white border-bottom">
+<div class="bg-white border-bottom shadow-sm">
   <div class="container py-5">
     <div class="text-center mb-4">
       <h1 class="display-4 fw-bold mb-3">
-        <i class="bi bi-geo-alt-fill text-primary"></i>
-        Descubre Colombia
+        <i class="bi bi-geo-alt-fill me-2" style="
+          background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        "></i>
+        <span style="
+          background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        ">Descubre Colombia</span>
       </h1>
       <p class="lead text-muted">Explora los destinos más increíbles del país</p>
+      
+      <!-- Decoración -->
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg, #F04D43, #F06B43);">
+          <i class="bi bi-compass me-1"></i> Aventura
+        </span>
+        <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg, #F08A43, #F0A843);">
+          <i class="bi bi-heart me-1"></i> Cultura
+        </span>
+        <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg, #F04388, #F0A993);">
+          <i class="bi bi-tree me-1"></i> Naturaleza
+        </span>
+      </div>
     </div>
   </div>
 </div>
@@ -20,51 +43,84 @@
   <div class="row g-4">
     {% for place in places %}
     <div class="col-md-6 col-lg-4">
-      <div class="card border-0 shadow-sm h-100 hover-lift">
+      <div class="card border-0 shadow-sm h-100 hover-lift" style="overflow: hidden;">
         <a href="{% url 'place_detail' place.slug %}" class="text-decoration-none">
-          {% if place.photo %}
-          <img src="{{ place.photo.url }}" class="card-img-top" alt="{{ place.name }}" 
-               style="height: 250px; object-fit: cover;">
-          {% else %}
-          <div class="bg-light d-flex align-items-center justify-content-center" 
-               style="height: 250px;">
-            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-          </div>
-          {% endif %}
-          
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <h5 class="card-title text-dark fw-bold mb-0">{{ place.name }}</h5>
-              {% if place.rating_average > 0 %}
-              <span class="badge bg-warning text-dark">
+          <div class="position-relative">
+            {% if place.photo %}
+            <img src="{{ place.photo.url }}" class="card-img-top" alt="{{ place.name }}" 
+                 style="height: 250px; object-fit: cover;">
+            {% else %}
+            <div class="d-flex align-items-center justify-content-center" 
+                 style="height: 250px; background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));">
+              <i class="bi bi-image" style="font-size: 3rem; color: #F06B43;"></i>
+            </div>
+            {% endif %}
+            
+            <!-- Overlay gradiente sutil -->
+            <div class="position-absolute top-0 start-0 w-100 h-100" 
+                 style="background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);"></div>
+            
+            <!-- Badge de rating flotante -->
+            {% if place.rating_average > 0 %}
+            <div class="position-absolute top-0 end-0 m-3">
+              <span class="badge px-3 py-2 shadow-sm" style="
+                background: linear-gradient(135deg, #F0A843, #F08A43);
+                font-size: 0.9rem;
+              ">
                 <i class="bi bi-star-fill"></i> {{ place.rating_average }}
               </span>
-              {% endif %}
             </div>
+            {% endif %}
+          </div>
+          
+          <div class="card-body p-4">
+            <h5 class="card-title text-dark fw-bold mb-2" style="transition: color 0.2s;">
+              {{ place.name }}
+            </h5>
             
             {% if place.city or place.department %}
-            <p class="text-muted small mb-2">
-              <i class="bi bi-pin-map"></i>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-pin-map-fill" style="color: #F06B43;"></i>
               {% if place.city %}{{ place.city }}{% endif %}
               {% if place.city and place.department %}, {% endif %}
               {% if place.department %}{{ place.department }}{% endif %}
             </p>
             {% endif %}
             
-            <p class="card-text text-secondary">{{ place.short_description }}</p>
+            <p class="card-text text-secondary mb-3" style="font-size: 0.95rem;">
+              {{ place.short_description|truncatewords:20 }}
+            </p>
             
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
               {% if place.category %}
-              <span class="badge bg-light text-dark border">
-                <i class="bi bi-tag"></i> {{ place.category }}
+              <span class="badge bg-light border px-3 py-2" style="
+                color: #F06B43;
+                border-color: rgba(240, 107, 67, 0.2) !important;
+              ">
+                <i class="bi bi-tag-fill"></i> {{ place.category }}
               </span>
               {% endif %}
               
               {% if place.estimated_cost > 0 %}
-              <span class="text-primary fw-semibold">
+              <span class="fw-bold" style="
+                color: #F04D43;
+                font-size: 1.1rem;
+              ">
                 Desde ${{ place.estimated_cost|floatformat:0 }}
               </span>
               {% endif %}
+            </div>
+            
+            <!-- Botón de ver más -->
+            <div class="mt-3">
+              <span class="btn btn-sm w-100 rounded-pill" style="
+                background: linear-gradient(135deg, #F04D43, #F06B43);
+                color: white;
+                border: none;
+                font-weight: 600;
+              ">
+                <i class="bi bi-arrow-right-circle me-1"></i> Ver detalles
+              </span>
             </div>
           </div>
         </a>
@@ -72,9 +128,13 @@
     </div>
     {% empty %}
     <div class="col-12">
-      <div class="alert alert-info text-center">
-        <i class="bi bi-info-circle me-2"></i>
-        No hay lugares disponibles en este momento.
+      <div class="alert border-0 text-center p-5" style="
+        background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
+        border-left: 4px solid #F06B43 !important;
+      ">
+        <i class="bi bi-info-circle-fill mb-3" style="font-size: 3rem; color: #F06B43;"></i>
+        <h5 class="fw-bold mb-2" style="color: #F04D43;">No hay lugares disponibles</h5>
+        <p class="text-muted mb-0">Estamos trabajando para traerte los mejores destinos de Colombia</p>
       </div>
     </div>
     {% endfor %}
@@ -83,12 +143,14 @@
 
 <style>
   .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
   }
   
   .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(240, 107, 67, 0.15) !important;
+    border-color: rgba(240, 107, 67, 0.1);
   }
   
   .card a {
@@ -96,7 +158,17 @@
   }
   
   .card a:hover .card-title {
-    color: #667eea !important;
+    color: #F06B43 !important;
+  }
+  
+  /* Animación del botón */
+  .card:hover .btn {
+    background: linear-gradient(135deg, #F06B43, #F08A43) !important;
+    transform: scale(1.02);
+  }
+  
+  .btn {
+    transition: all 0.3s ease;
   }
 </style>
 {% endblock %}

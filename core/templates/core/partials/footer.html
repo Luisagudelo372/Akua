@@ -1,0 +1,200 @@
+{% load static %}
+
+<!-- Footer -->
+<footer class="bg-white border-top mt-auto">
+  <div class="container py-5">
+    <div class="row g-4">
+      <!-- Columna 1: Logo y descripción -->
+      <div class="col-lg-4 col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <img src="{% static 'core/img/logo_akua.jpg' %}" alt="Akua Logo"
+                style="height: 45px; width: auto; border-radius: 10px; margin-right: 8px;">
+            <strong style="
+            background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            ">Akua</strong>
+        </div>
+        <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
+          Tu compañero de viaje perfecto para descubrir los destinos más increíbles de Colombia. 
+          Planea, explora y vive experiencias únicas.
+        </p>
+        <div class="d-flex gap-2">
+          <a href="#" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+             style="
+               width: 38px; 
+               height: 38px;
+               background: linear-gradient(135deg, #F04D43, #F06B43);
+               color: white;
+               transition: all 0.3s ease;
+             "
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(240,107,67,0.3)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a href="#" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+             style="
+               width: 38px; 
+               height: 38px;
+               background: linear-gradient(135deg, #F06B43, #F08A43);
+               color: white;
+               transition: all 0.3s ease;
+             "
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(240,107,67,0.3)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="bi bi-instagram"></i>
+          </a>
+          <a href="#" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+             style="
+               width: 38px; 
+               height: 38px;
+               background: linear-gradient(135deg, #F08A43, #F0A843);
+               color: white;
+               transition: all 0.3s ease;
+             "
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(240,107,67,0.3)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="bi bi-twitter-x"></i>
+          </a>
+          <a href="#" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+             style="
+               width: 38px; 
+               height: 38px;
+               background: linear-gradient(135deg, #F04388, #F04D43);
+               color: white;
+               transition: all 0.3s ease;
+             "
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 12px rgba(240,107,67,0.3)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="bi bi-youtube"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Columna 2: Enlaces rápidos -->
+      <div class="col-lg-2 col-md-6">
+        <h6 class="fw-bold mb-3" style="color: #F04D43;">
+          <i class="bi bi-compass me-1"></i> Explorar
+        </h6>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <a href="{% url 'index' %}" class="text-decoration-none footer-link">Home</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'places' %}" class="text-decoration-none footer-link">Lugares</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'donde_ir' %}" class="text-decoration-none footer-link">Planear Viaje</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'reviews' %}" class="text-decoration-none footer-link">Reseñas</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Cuenta -->
+      <div class="col-lg-2 col-md-6">
+        <h6 class="fw-bold mb-3" style="color: #F06B43;">
+          <i class="bi bi-person me-1"></i> Cuenta
+        </h6>
+        <ul class="list-unstyled">
+          {% if user.is_authenticated %}
+          <li class="mb-2">
+            <a href="{% url 'profile' %}" class="text-decoration-none footer-link">Mi Perfil</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'dashboard' %}" class="text-decoration-none footer-link">Dashboard</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'logout' %}" class="text-decoration-none footer-link">Cerrar Sesión</a>
+          </li>
+          {% else %}
+          <li class="mb-2">
+            <a href="{% url 'login' %}" class="text-decoration-none footer-link">Iniciar Sesión</a>
+          </li>
+          <li class="mb-2">
+            <a href="{% url 'register' %}" class="text-decoration-none footer-link">Registrarse</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Columna 4: Soporte -->
+      <div class="col-lg-4 col-md-6">
+        <h6 class="fw-bold mb-3" style="color: #F08A43;">
+          <i class="bi bi-headset me-1"></i> Contacto
+        </h6>
+        <ul class="list-unstyled">
+          <li class="mb-2 d-flex align-items-center">
+            <i class="bi bi-envelope-fill me-2" style="color: #F06B43;"></i>
+            <a href="mailto:info@akua.com" class="text-decoration-none footer-link">info@akua.com</a>
+          </li>
+          <li class="mb-2 d-flex align-items-center">
+            <i class="bi bi-telephone-fill me-2" style="color: #F06B43;"></i>
+            <span class="text-muted">+57 300 123 4567</span>
+          </li>
+          <li class="mb-2 d-flex align-items-start">
+            <i class="bi bi-geo-alt-fill me-2 mt-1" style="color: #F06B43;"></i>
+            <span class="text-muted">Medellín, Antioquia<br>Colombia</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Separador -->
+    <hr class="my-4" style="border-color: rgba(240, 107, 67, 0.2);">
+
+    <!-- Copyright -->
+    <div class="row align-items-center">
+      <div class="col-md-6 text-center text-md-start">
+        <p class="text-muted small mb-0">
+          © 2025 <strong style="color: #F06B43;">Akua</strong>. Todos los derechos reservados.
+        </p>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <ul class="list-inline mb-0 small">
+          <li class="list-inline-item">
+            <a href="#" class="text-decoration-none footer-link">Términos de Uso</a>
+          </li>
+          <li class="list-inline-item">•</li>
+          <li class="list-inline-item">
+            <a href="#" class="text-decoration-none footer-link">Privacidad</a>
+          </li>
+          <li class="list-inline-item">•</li>
+          <li class="list-inline-item">
+            <a href="#" class="text-decoration-none footer-link">Cookies</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Estilos para los enlaces del footer */
+  .footer-link {
+    color: #6c757d;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+  }
+  
+  .footer-link:hover {
+    color: #F06B43;
+    padding-left: 5px;
+  }
+
+  /* Asegurar que el footer esté al fondo */
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  main {
+    flex: 1;
+  }
+
+
+</style>

@@ -1,32 +1,95 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" style="backdrop-filter: blur(6px)">
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm" style="backdrop-filter: blur(6px)">
   <div class="container">
+    <!-- LOGO + NOMBRE -->
     <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
-      <span class="navbar-brand-logo"><i class="bi bi-leaf-fill"></i></span>
-      <strong>Akua</strong>
+      <img src="{% static 'core/img/logo_akua.jpg' %}" 
+           alt="Akua Logo" 
+           style="height: 40px; width: auto; border-radius: 8px;">
+      <strong style="
+        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 1.5rem;
+      ">Akua</strong>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#akuaNav">
+
+    <!-- BOTÓN RESPONSIVE -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#akuaNav" style="border-color: #F06B43;">
       <span class="navbar-toggler-icon"></span>
     </button>
+
+    <!-- MENÚ DE NAVEGACIÓN -->
     <div class="collapse navbar-collapse" id="akuaNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'donde_ir' %}">Plan Trip</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'places' %}">Places</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'reviews' %}">Reviews</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'donde_ir' %}active{% endif %}" href="{% url 'donde_ir' %}">Plan Trip</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'places' %}active{% endif %}" href="{% url 'places' %}">Places</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'reviews' %}active{% endif %}" href="{% url 'reviews' %}">Reviews</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">Profile</a>
+        </li>
         {% if user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+        </li>
         {% endif %}
       </ul>
+
+      <!-- BOTONES DE SESIÓN -->
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}" class="btn btn-outline-secondary rounded-pill">Logout</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-secondary rounded-pill" style="border-color: #F06B43; color: #F06B43;">
+          <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </a>
         {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-secondary rounded-pill">Login</a>
-        <a href="{% url 'register' %}" class="btn btn-akua rounded-pill">Sign Up</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-secondary rounded-pill" style="border-color: #F06B43; color: #F06B43;">
+          Login
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-akua rounded-pill px-4">
+          <i class="bi bi-person-plus me-1"></i>Sign Up
+        </a>
         {% endif %}
       </div>
     </div>
   </div>
 </nav>
+
+<style>
+  /* Hover effects para nav links */
+  .nav-link {
+    color: #6c757d;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: #F06B43 !important;
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: #F06B43 !important;
+    border-color: #F06B43 !important;
+    color: white !important;
+  }
+
+  /* Active state para navegación */
+  .nav-link.active {
+    color: #F06B43 !important;
+    font-weight: 600;
+  }
+
+  /* Pequeño efecto en hover del logo */
+  .navbar-brand img:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+</style>

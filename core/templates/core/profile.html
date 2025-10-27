@@ -7,16 +7,24 @@
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <!-- Header -->
-      <div class="mb-4">
-        <h1 class="display-5 fw-bold mb-2">Mi Perfil</h1>
+      <!-- Header con gradiente -->
+      <div class="mb-4 text-center">
+        <h1 class="display-5 fw-bold mb-2" style="
+          background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        ">Mi Perfil</h1>
         <p class="text-muted">Personaliza tu experiencia de viaje en Akua</p>
       </div>
 
       <!-- Mensajes -->
       {% if messages %}
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" style="
+            border-left: 4px solid #F06B43;
+          ">
+            <i class="bi bi-check-circle-fill me-2" style="color: #F06B43;"></i>
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
@@ -24,28 +32,35 @@
       {% endif %}
 
       <!-- Card del Perfil -->
-      <div class="card border-0 shadow-sm">
+      <div class="card border-0 shadow-sm" style="border-top: 4px solid #F06B43 !important;">
         <div class="card-body p-4">
           <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <!-- Foto de Perfil -->
+            <!-- Foto de Perfil con borde gradiente -->
             <div class="text-center mb-4">
               <div class="position-relative d-inline-block">
-                {% if profile.photo %}
-                  <img src="{{ profile.photo.url }}" alt="Foto de perfil" 
-                       class="rounded-circle object-fit-cover" 
-                       style="width: 120px; height: 120px;">
-                {% else %}
-                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" 
-                       style="width: 120px; height: 120px;">
-                    <i class="bi bi-person-circle text-muted" style="font-size: 4rem;"></i>
-                  </div>
-                {% endif %}
+                <div style="
+                  padding: 4px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+                  display: inline-block;
+                ">
+                  {% if profile.photo %}
+                    <img src="{{ profile.photo.url }}" alt="Foto de perfil" 
+                         class="rounded-circle object-fit-cover bg-white" 
+                         style="width: 120px; height: 120px;">
+                  {% else %}
+                    <div class="rounded-circle bg-white d-flex align-items-center justify-content-center" 
+                         style="width: 120px; height: 120px;">
+                      <i class="bi bi-person-circle" style="font-size: 4rem; color: #F06B43;"></i>
+                    </div>
+                  {% endif %}
+                </div>
               </div>
               <div class="mt-3">
-                <label for="id_photo" class="btn btn-sm btn-outline-secondary" style="cursor: pointer;">
-                  <i class="bi bi-camera"></i> Cambiar foto
+                <label for="id_photo" class="btn btn-sm btn-akua rounded-pill" style="cursor: pointer;">
+                  <i class="bi bi-camera-fill"></i> Cambiar foto
                 </label>
                 <input type="file" name="photo" accept="image/*" id="id_photo" class="d-none">
                 {% if form.photo.errors %}
@@ -55,27 +70,36 @@
             </div>
 
             <!-- Información Personal -->
-            <div class="mb-4">
-              <h5 class="fw-semibold mb-3">
-                <i class="bi bi-person-fill text-primary me-2"></i>
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 107, 67, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F04D43 0%, #F06B43 100%);
+                  color: white;
+                ">
+                  <i class="bi bi-person-fill"></i>
+                </span>
                 Información Personal
               </h5>
               
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label for="id_first_name" class="form-label">Nombre</label>
+                  <label for="id_first_name" class="form-label fw-medium" style="color: #495057;">Nombre</label>
                   <input type="text" name="first_name" maxlength="150" 
                          class="form-control" placeholder="Nombre" 
-                         id="id_first_name" value="{{ form.first_name.value|default:'' }}">
+                         id="id_first_name" value="{{ form.first_name.value|default:'' }}"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   {% if form.first_name.errors %}
                     <div class="text-danger small">{{ form.first_name.errors }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
-                  <label for="id_last_name" class="form-label">Apellido</label>
+                  <label for="id_last_name" class="form-label fw-medium" style="color: #495057;">Apellido</label>
                   <input type="text" name="last_name" maxlength="150" 
                          class="form-control" placeholder="Apellido" 
-                         id="id_last_name" value="{{ form.last_name.value|default:'' }}">
+                         id="id_last_name" value="{{ form.last_name.value|default:'' }}"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   {% if form.last_name.errors %}
                     <div class="text-danger small">{{ form.last_name.errors }}</div>
                   {% endif %}
@@ -84,19 +108,21 @@
 
               <div class="row g-3 mt-2">
                 <div class="col-md-6">
-                  <label for="id_email" class="form-label">Email</label>
+                  <label for="id_email" class="form-label fw-medium" style="color: #495057;">Email</label>
                   <input type="email" name="email" 
                          class="form-control" placeholder="tu@email.com" 
-                         id="id_email" value="{{ form.email.value|default:'' }}">
+                         id="id_email" value="{{ form.email.value|default:'' }}"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   {% if form.email.errors %}
                     <div class="text-danger small">{{ form.email.errors }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
-                  <label for="id_age" class="form-label">Edad</label>
+                  <label for="id_age" class="form-label fw-medium" style="color: #495057;">Edad</label>
                   <input type="number" name="age" min="13" max="120" 
                          class="form-control" placeholder="Edad" 
-                         id="id_age" value="{{ form.age.value|default:'' }}">
+                         id="id_age" value="{{ form.age.value|default:'' }}"
+                         style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   {% if form.age.errors %}
                     <div class="text-danger small">{{ form.age.errors }}</div>
                   {% endif %}
@@ -104,20 +130,28 @@
               </div>
             </div>
 
-            <hr class="my-4">
+            <hr class="my-4" style="border-color: rgba(240, 107, 67, 0.2);">
 
             <!-- Preferencias de Viaje -->
-            <div class="mb-4">
-              <h5 class="fw-semibold mb-3">
-                <i class="bi bi-compass-fill text-success me-2"></i>
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 138, 67, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F08A43 0%, #F0A843 100%);
+                  color: white;
+                ">
+                  <i class="bi bi-compass-fill"></i>
+                </span>
                 Preferencias de Viaje
               </h5>
 
               <div class="mb-3">
-                <label for="id_budget_preference" class="form-label">
+                <label for="id_budget_preference" class="form-label fw-medium" style="color: #495057;">
                   Presupuesto Preferido por Viaje
                 </label>
-                <select name="budget_preference" class="form-select" id="id_budget_preference">
+                <select name="budget_preference" class="form-select" id="id_budget_preference"
+                        style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   <option value="0-500" {% if form.budget_preference.value == '0-500' %}selected{% endif %}>$0 - $500</option>
                   <option value="500-1000" {% if form.budget_preference.value == '500-1000' %}selected{% endif %}>$500 - $1,000</option>
                   <option value="1000-2000" {% if form.budget_preference.value == '1000-2000' %}selected{% endif %}>$1,000 - $2,000</option>
@@ -125,57 +159,79 @@
                   <option value="3000-5000" {% if form.budget_preference.value == '3000-5000' %}selected{% endif %}>$3,000 - $5,000</option>
                   <option value="5000+" {% if form.budget_preference.value == '5000+' %}selected{% endif %}>$5,000+</option>
                 </select>
-                <div class="form-text">Selecciona el rango de presupuesto que mejor se ajuste a tus viajes típicos</div>
+                <div class="form-text">
+                  <i class="bi bi-info-circle" style="color: #F0A843;"></i>
+                  Selecciona el rango de presupuesto que mejor se ajuste a tus viajes típicos
+                </div>
                 {% if form.budget_preference.errors %}
                   <div class="text-danger small">{{ form.budget_preference.errors }}</div>
                 {% endif %}
               </div>
 
               <div class="mb-3">
-                <label for="id_interests" class="form-label">
+                <label for="id_interests" class="form-label fw-medium" style="color: #495057;">
                   Intereses en Eventos
                 </label>
                 <input type="text" name="interests" maxlength="200" 
                        class="form-control" 
                        placeholder="Ej: conciertos, festivales, naturaleza" 
-                       id="id_interests" value="{{ form.interests.value|default:'' }}">
-                <div class="form-text">Separa tus intereses con comas (ej: conciertos, festivales, naturaleza)</div>
+                       id="id_interests" value="{{ form.interests.value|default:'' }}"
+                       style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
+                <div class="form-text">
+                  <i class="bi bi-lightbulb" style="color: #F0A843;"></i>
+                  Separa tus intereses con comas (ej: conciertos, festivales, naturaleza)
+                </div>
                 {% if form.interests.errors %}
                   <div class="text-danger small">{{ form.interests.errors }}</div>
                 {% endif %}
               </div>
             </div>
 
-            <hr class="my-4">
+            <hr class="my-4" style="border-color: rgba(240, 107, 67, 0.2);">
 
             <!-- Experiencia de Viaje -->
-            <div class="mb-4">
-              <h5 class="fw-semibold mb-3">
-                <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+            <div class="mb-4 p-4 rounded-3" style="background-color: rgba(240, 67, 136, 0.03);">
+              <h5 class="fw-semibold mb-3 d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+                  width: 36px;
+                  height: 36px;
+                  background: linear-gradient(135deg, #F04388 0%, #F04D43 100%);
+                  color: white;
+                ">
+                  <i class="bi bi-geo-alt-fill"></i>
+                </span>
                 Experiencia de Viaje
               </h5>
 
               <div class="mb-3">
-                <label for="id_visited_places" class="form-label">
+                <label for="id_visited_places" class="form-label fw-medium" style="color: #495057;">
                   Lugares que has Visitado
                 </label>
                 <textarea name="visited_places" class="form-control" rows="4" 
                           placeholder="Ej: Cartagena, Bogotá, Medellín, Santa Marta..." 
-                          id="id_visited_places">{{ form.visited_places.value|default:'' }}</textarea>
-                <div class="form-text">Comparte los destinos que has explorado</div>
+                          id="id_visited_places"
+                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">{{ form.visited_places.value|default:'' }}</textarea>
+                <div class="form-text">
+                  <i class="bi bi-map" style="color: #F04388;"></i>
+                  Comparte los destinos que has explorado
+                </div>
                 {% if form.visited_places.errors %}
                   <div class="text-danger small">{{ form.visited_places.errors }}</div>
                 {% endif %}
               </div>
 
               <div class="mb-3">
-                <label for="id_biography" class="form-label">
+                <label for="id_biography" class="form-label fw-medium" style="color: #495057;">
                   Biografía
                 </label>
                 <textarea name="biography" maxlength="500" class="form-control" rows="4" 
                           placeholder="Cuéntanos sobre tu pasión por viajar (máximo 500 caracteres)" 
-                          id="id_biography">{{ form.biography.value|default:'' }}</textarea>
-                <div class="form-text">Cuéntanos sobre tu pasión por viajar (máximo 500 caracteres)</div>
+                          id="id_biography"
+                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">{{ form.biography.value|default:'' }}</textarea>
+                <div class="form-text">
+                  <i class="bi bi-pencil" style="color: #F04388;"></i>
+                  Cuéntanos sobre tu pasión por viajar (máximo 500 caracteres)
+                </div>
                 {% if form.biography.errors %}
                   <div class="text-danger small">{{ form.biography.errors }}</div>
                 {% endif %}
@@ -184,11 +240,12 @@
 
             <!-- Botones -->
             <div class="d-flex gap-2 justify-content-end mt-4">
-              <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+              <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-x-circle me-1"></i>
                 Cancelar
               </a>
-              <button type="submit" class="btn btn-akua">
-                <i class="bi bi-check-circle me-1"></i>
+              <button type="submit" class="btn btn-akua rounded-pill px-4 shadow-sm">
+                <i class="bi bi-check-circle-fill me-1"></i>
                 Guardar Cambios
               </button>
             </div>
@@ -199,7 +256,7 @@
       <!-- Info adicional -->
       <div class="text-center mt-4 text-muted small">
         <p class="mb-1">
-          <i class="bi bi-shield-check"></i> 
+          <i class="bi bi-shield-check" style="color: #F06B43;"></i> 
           Tu información está segura y solo se usa para personalizar tu experiencia
         </p>
         <p class="mb-0">
@@ -214,15 +271,47 @@
 </div>
 
 <style>
-  .btn-akua {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+  /* Focus states para inputs */
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #F06B43 !important;
+    box-shadow: 0 0 0 0.2rem rgba(240, 107, 67, 0.15) !important;
   }
-  
-  .btn-akua:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #63408a 100%);
-    color: white;
+
+  /* Hover para botón cancelar */
+  .btn-outline-secondary {
+    border-color: #dee2e6;
+    color: #6c757d;
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+    color: #495057;
+  }
+
+  /* Animación para el botón guardar */
+  .btn-akua {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-akua::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-akua:hover::before {
+    width: 300px;
+    height: 300px;
   }
 </style>
 {% endblock %}

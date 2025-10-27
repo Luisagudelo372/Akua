@@ -8,18 +8,30 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="mb-4">
-                <a href="{% url 'reviews' %}" class="text-decoration-none text-secondary">
+                <a href="{% url 'reviews' %}" class="text-decoration-none d-inline-flex align-items-center" style="
+                    color: #F06B43;
+                    font-weight: 500;
+                    transition: color 0.2s;
+                ">
                     <i class="bi bi-arrow-left me-2"></i>Back to Reviews
                 </a>
             </div>
 
-            <div class="card card-ghost">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #F06B43 !important;">
                 <div class="card-body p-4">
-                    <h2 class="fw-bold mb-4">Write a Review</h2>
+                    <h2 class="fw-bold mb-4" style="
+                        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                    ">Write a Review</h2>
 
                     {% if messages %}
                     {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" style="
+                        border-left: 4px solid #F06B43;
+                    ">
+                        <i class="bi bi-check-circle-fill me-2" style="color: #F06B43;"></i>
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -30,9 +42,9 @@
                         {% csrf_token %}
 
                         <div class="mb-4">
-                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
                                 Título de la Reseña
-                                <span class="text-danger">*</span>
+                                <span style="color: #F04388;">*</span>
                             </label>
                             {{ form.title }}
                             {% if form.title.errors %}
@@ -43,9 +55,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.place.id_for_label }}" class="form-label fw-semibold">
+                            <label for="{{ form.place.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
                                 Lugar
-                                <span class="text-danger">*</span>
+                                <span style="color: #F04388;">*</span>
                             </label>
                             {{ form.place }}
                             {% if form.place.errors %}
@@ -56,9 +68,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.qualification.id_for_label }}" class="form-label fw-semibold">
+                            <label for="{{ form.qualification.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
                                 Calificación
-                                <span class="text-danger">*</span>
+                                <span style="color: #F04388;">*</span>
                             </label>
                             {{ form.qualification }}
                             {% if form.qualification.errors %}
@@ -67,14 +79,15 @@
                             </div>
                             {% endif %}
                             <div class="form-text">
-                                <i class="bi bi-star-fill text-warning"></i> Califica tu experiencia de 1 a 5 estrellas
+                                <i class="bi bi-star-fill" style="color: #F0A843;"></i> 
+                                Califica tu experiencia de 1 a 5 estrellas
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
                                 Tu Experiencia
-                                <span class="text-danger">*</span>
+                                <span style="color: #F04388;">*</span>
                             </label>
                             {{ form.description }}
                             {% if form.description.errors %}
@@ -88,10 +101,13 @@
                         </div>
 
                         <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-akua rounded-3 text-white fw-semibold px-4">
+                            <button type="submit" class="btn btn-akua rounded-3 fw-semibold px-4 shadow-sm">
                                 <i class="bi bi-send me-2"></i>Publicar Reseña
                             </button>
-                            <a href="{% url 'reviews' %}" class="btn btn-outline-secondary rounded-3">
+                            <a href="{% url 'reviews' %}" class="btn btn-outline-secondary rounded-3" style="
+                                border-color: #dee2e6;
+                                color: #6c757d;
+                            ">
                                 Cancelar
                             </a>
                         </div>
@@ -99,11 +115,15 @@
                 </div>
             </div>
 
-            <div class="mt-4 p-4 card card-ghost">
-                <h6 class="fw-semibold mb-3">
-                    <i class="bi bi-lightbulb text-warning me-2"></i>Tips para escribir una buena reseña
+            <div class="mt-4 p-4 card border-0 shadow-sm" style="
+                background: linear-gradient(135deg, rgba(240, 107, 67, 0.03), rgba(240, 169, 147, 0.03));
+                border-left: 4px solid #F0A843 !important;
+            ">
+                <h6 class="fw-semibold mb-3 d-flex align-items-center" style="color: #F04D43;">
+                    <i class="bi bi-lightbulb me-2" style="color: #F0A843; font-size: 1.2rem;"></i>
+                    Tips para escribir una buena reseña
                 </h6>
-                <ul class="small text-secondary mb-0">
+                <ul class="small text-secondary mb-0" style="line-height: 1.8;">
                     <li class="mb-2">Sé específico sobre lo que te gustó o no te gustó</li>
                     <li class="mb-2">Incluye detalles sobre el lugar, instalaciones y ambiente</li>
                     <li class="mb-2">Menciona si es adecuado para familias, parejas o viajeros solitarios</li>
@@ -113,4 +133,26 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Focus states para inputs */
+    .form-control:focus,
+    .form-select:focus,
+    textarea:focus {
+        border-color: #F06B43 !important;
+        box-shadow: 0 0 0 0.2rem rgba(240, 107, 67, 0.15) !important;
+    }
+
+    /* Hover para botón cancelar */
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    /* Hover para link de volver */
+    a[href*="reviews"]:hover {
+        color: #F04D43 !important;
+    }
+</style>
 {% endblock %}

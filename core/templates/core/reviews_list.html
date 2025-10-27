@@ -5,53 +5,159 @@
 
 {% block content %}
 <div class="container my-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="fw-bold">Travel Reviews</h1>
-    <a href="{% url 'write_review' %}" class="btn btn-akua rounded-3 text-white">Write Review</a>
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="fw-bold mb-2" style="
+        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      ">
+        <i class="bi bi-chat-quote-fill me-2"></i>Travel Reviews
+      </h1>
+      <p class="text-muted mb-0">Descubre experiencias reales de viajeros como tú</p>
+    </div>
+    <a href="{% url 'write_review' %}" class="btn btn-akua rounded-pill px-4 py-2 shadow-sm" style="
+      font-weight: 600;
+    ">
+      <i class="bi bi-pencil-fill me-2"></i>Write Review
+    </a>
   </div>
 
   <div class="vstack gap-4">
     {% for review in reviews %}
-    <article class="card card-ghost">
-      <div class="card-body d-flex gap-3">
-        <img src="{% static 'core/img/tayrona-national-park-beach-jungle-colombia.jpg' %}" class="rounded-3 border"
-          style="width:112px;height:112px;object-fit:cover" alt="{{ review.place.name }}">
-        <div class="flex-grow-1">
-          <div class="d-flex align-items-start justify-content-between">
-            <h3 class="h5 fw-semibold mb-1">{{ review.title }}</h3>
-            <div class="rating">
-              {% for i in "12345" %}
-              {% if forloop.counter <= review.qualification %} <i class="bi bi-star-fill text-warning"></i>
-                {% else %}
-                <i class="bi bi-star text-warning"></i>
-                {% endif %}
+    <article class="card border-0 shadow-sm hover-lift" style="
+      border-left: 4px solid #F06B43 !important;
+      transition: all 0.3s ease;
+    ">
+      <div class="card-body p-4">
+        <div class="d-flex gap-4">
+          <!-- Imagen del lugar -->
+          <div class="flex-shrink-0">
+            {% if review.place.photo %}
+            <img src="{{ review.place.photo.url }}" class="rounded-3 shadow-sm"
+              style="width:120px;height:120px;object-fit:cover;border:3px solid rgba(240,107,67,0.1)" 
+              alt="{{ review.place.name }}">
+            {% else %}
+            <div class="rounded-3 d-flex align-items-center justify-content-center" style="
+              width:120px;
+              height:120px;
+              background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));
+              border:3px solid rgba(240,107,67,0.1);
+            ">
+              <i class="bi bi-image" style="font-size: 2rem; color: #F06B43;"></i>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Contenido de la reseña -->
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+              <h3 class="h5 fw-bold mb-0" style="color: #2c3e50;">{{ review.title }}</h3>
+              <div class="rating d-flex gap-1">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= review.qualification %}
+                    <i class="bi bi-star-fill" style="color: #F0A843; font-size: 1.1rem;"></i>
+                  {% else %}
+                    <i class="bi bi-star" style="color: #F0A843; font-size: 1.1rem;"></i>
+                  {% endif %}
                 {% endfor %}
+              </div>
             </div>
-          </div>
-          <div class="text-secondary small mb-2">
-            {{ review.place.name }} • {{ review.place.city }}, {{ review.place.department }}
-            <span class="badge rounded-pill text-bg-light border ms-2">{{ review.place.category }}</span>
-          </div>
-          <p class="mb-2">
-            {{ review.description|truncatewords:20 }}
-          </p>
-          <div class="d-flex align-items-center justify-content-between small text-secondary">
-            <div class="d-flex align-items-center gap-2">
-              <img src="{% static 'core/img/placeholder-user.jpg' %}" class="rounded-circle border"
-                style="width:32px;height:32px" alt="{{ review.user.username }}">
-              <span>{{ review.user.get_full_name|default:review.user.username }}</span>
+
+            <!-- Info del lugar -->
+            <div class="mb-3">
+              <span class="text-secondary me-2">
+                <i class="bi bi-geo-alt-fill" style="color: #F06B43;"></i>
+                <strong>{{ review.place.name }}</strong>
+              </span>
+              <span class="text-muted small">
+                {{ review.place.city }}, {{ review.place.department }}
+              </span>
+              <span class="badge rounded-pill ms-2 px-3 py-1" style="
+                background-color: rgba(240, 107, 67, 0.1);
+                color: #F04D43;
+                border: 1px solid rgba(240, 107, 67, 0.2);
+              ">
+                <i class="bi bi-tag-fill me-1"></i>{{ review.place.category }}
+              </span>
             </div>
-            <span>{{ review.get_time_ago }}</span>
+
+            <!-- Descripción -->
+            <p class="text-secondary mb-3" style="line-height: 1.7;">
+              {{ review.description|truncatewords:25 }}
+            </p>
+
+            <!-- Footer con autor y fecha -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+              <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="
+                  width:36px;
+                  height:36px;
+                  background: linear-gradient(135deg, #F04D43, #F06B43);
+                  color: white;
+                  font-weight: 600;
+                ">
+                  {% if review.user.get_full_name %}
+                    {{ review.user.get_full_name|slice:":1"|upper }}
+                  {% else %}
+                    {{ review.user.username|slice:":1"|upper }}
+                  {% endif %}
+                </div>
+                <div>
+                  <div class="fw-semibold" style="font-size: 0.9rem; color: #2c3e50;">
+                    {{ review.user.get_full_name|default:review.user.username }}
+                  </div>
+                  <div class="text-muted small">
+                    <i class="bi bi-clock" style="color: #F06B43;"></i>
+                    {{ review.get_time_ago }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón de ver más (opcional) -->
+              <a href="{% url 'place_detail' review.place.slug %}" 
+                 class="btn btn-sm rounded-pill" 
+                 style="
+                   background-color: rgba(240, 107, 67, 0.1);
+                   color: #F04D43;
+                   border: none;
+                   font-weight: 600;
+                 ">
+                <i class="bi bi-arrow-right-circle me-1"></i>Ver lugar
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </article>
     {% empty %}
-    <div class="alert alert-info text-center">
-      <i class="bi bi-info-circle me-2"></i>
-      No reviews yet. Be the first to share your experience!
+    <div class="card border-0 shadow-sm text-center p-5" style="
+      background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
+      border-left: 4px solid #F06B43 !important;
+    ">
+      <div class="mb-3">
+        <i class="bi bi-chat-left-quote" style="font-size: 4rem; color: #F06B43; opacity: 0.5;"></i>
+      </div>
+      <h5 class="fw-bold mb-2" style="color: #F04D43;">No hay reseñas todavía</h5>
+      <p class="text-muted mb-4">¡Sé el primero en compartir tu experiencia de viaje!</p>
+      <a href="{% url 'write_review' %}" class="btn btn-akua rounded-pill px-4">
+        <i class="bi bi-pencil-fill me-2"></i>Escribir Primera Reseña
+      </a>
     </div>
     {% endfor %}
   </div>
 </div>
+
+<style>
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(240, 107, 67, 0.15) !important;
+  }
+</style>
 {% endblock %}
