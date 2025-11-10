@@ -90,44 +90,51 @@
             </p>
 
             <!-- Footer con autor y fecha -->
-            <div class="review-footer d-flex flex-wrap align-items-center justify-content-between pt-3 border-top">
+            <div class="review-footer d-flex align-items-center justify-content-between pt-3 border-top">
               <div class="author-block d-flex align-items-center gap-2 flex-grow-1 min-w-0">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                  style="width:36px;height:36px;background: linear-gradient(135deg, #F04D43, #F06B43);color: white;font-weight: 600;flex: 0 0 36px;">
-                  {{ review.user.get_full_name|slice:":1"|default:review.user.username|slice:":1"|upper }}
+                <div class="avatar-wrapper">
+                  {% if review.user.profile and review.user.profile.avatar %}
+                  <img src="{{ review.user.profile.avatar.url }}"
+                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                  {% elif review.user.profile and review.user.profile.photo %}
+                  <img src="{{ review.user.profile.photo.url }}"
+                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                  {% elif review.user.avatar %}
+                  <img src="{{ review.user.avatar.url }}"
+                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                  {% elif review.user.photo %}
+                  <img src="{{ review.user.photo.url }}"
+                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                  {% else %}
+                  <div class="rounded-circle review-avatar initials">
+                    {{ review.user.get_full_name|default:review.user.username|slice:":1"|upper }}
+                  </div>
+                  {% endif %}
                 </div>
 
                 <div class="author-meta min-w-0">
-                  <div class="fw-semibold text-truncate" style="color:#2c3e50; max-width:220px;">
+                  <div class="fw-semibold text-truncate author-name">
                     {{ review.user.get_full_name|default:review.user.username }}
                   </div>
-                  <div class="text-muted small text-truncate" style="max-width:220px;">
+                  <div class="text-muted small text-truncate author-time">
                     <i class="bi bi-clock" style="color: #F06B43;"></i>
                     {{ review.get_time_ago }}
                   </div>
                 </div>
               </div>
 
-              <!-- Right side: keep everything on one line and avoid pushing -->
-              <div class="d-flex align-items-center gap-2 flex-shrink-0" style="white-space: nowrap;">
-                <a href="{% url 'place_detail' review.place.slug %}" class="btn btn-sm rounded-pill" style="
-                      background-color: rgba(240, 107, 67, 0.1);
-                      color: #F04D43;
-                      border: none;
-                      font-weight: 600;
-                    ">
+              <div class="actions d-flex align-items-center gap-2 ms-4 flex-shrink-0">
+                <a href="{% url 'place_detail' review.place.slug %}" class="btn btn-sm rounded-pill"
+                  style="background-color: rgba(240, 107, 67, 0.1); color: #F04D43; border: none; font-weight: 600;">
                   <i class="bi bi-arrow-right-circle me-1"></i>Ver lugar
                 </a>
 
                 {% if user.is_authenticated and review.user == user %}
-                <!-- compact icon-only action buttons to avoid pushing layout -->
                 <div class="btn-group" role="group" aria-label="Acciones reseña">
                   <a href="{% url 'edit_review' review.pk %}" class="btn btn-sm btn-outline-primary"
                     title="Editar reseña">
                     <i class="bi bi-pencil-fill"></i>
                   </a>
-
-                  <!-- trigger modal; data-url used by script -->
                   <button type="button" class="btn btn-sm btn-outline-danger btn-delete-review"
                     data-url="{% url 'delete_review' review.pk %}" data-review-id="{{ review.pk }}"
                     data-bs-toggle="modal" data-bs-target="#deleteReviewModal" title="Eliminar reseña">
@@ -207,64 +214,144 @@
 </script>
 
 <style>
+  /* --- clock icon / time label: avoid being clipped --- */
+  .review-footer .author-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    /* small gap between icon and text */
+    padding-left: 0.12rem;
+    /* avoids left clipping when container is tight */
+    min-width: 0;
+    /* allow truncation rules on parent to work */
+  }
+
+  /* ensure name/time can truncate nicely without clipping icon */
   .review-footer .author-meta {
     min-width: 0;
   }
 
-  .review-footer .text-truncate {
+  .review-footer .author-name,
+  .review-footer .author-time {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .review-footer {
-    gap: 0.75rem;
-    /* adjust value to taste (0.5rem = ms-2, 0.75rem = ms-3-ish) */
+  /* --- prevent stars and action buttons from overflowing the card --- */
+  /* rating (stars) should not be the element that shrinks the title; keep it stable */
+  .rating {
+    display: inline-flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    align-items: center;
   }
 
-  /* Fallback / forced: increase left margin on actions if a utility class overrides it */
+  /* allow the main inner flex row to wrap when available space is low */
+  .card-body>.d-flex {
+    flex-wrap: wrap;
+  }
+
+  /* make the title shrink first so stars/actions stay visible */
+  .h5.fw-bold.mb-0 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* keep actions from shrinking awkwardly but allow them to wrap under on very small screens */
   .review-footer .actions {
-    margin-left: 1rem !important;
-    /* tweak value and remove !important later if not needed */
+    flex: 0 0 auto;
   }
 
   @media (max-width: 576px) {
-    .review-footer .author-meta>div {
-      max-width: 140px;
+
+    /* at very small sizes allow actions to wrap under content */
+    .card-body>.d-flex {
+      flex-wrap: wrap;
+    }
+
+    .review-footer {
+      gap: 0.5rem;
     }
   }
 
+  /* --- restore button colors with higher specificity so utilities don't override them --- */
   .review-footer .btn-group .btn-outline-primary {
-    color: #F08A43;
-    /* text / border color */
-    border-color: #F08A43;
+    color: #0ea5a4 !important;
+    border-color: #0ea5a4 !important;
+    background-color: transparent !important;
   }
 
   .review-footer .btn-group .btn-outline-primary:hover,
   .review-footer .btn-group .btn-outline-primary:focus {
-    background-color: rgba(14, 165, 164, 0.08);
-    /* subtle hover bg */
-    color: #f08b43da;
-    border-color: #F08A43;
+    background-color: rgba(14, 165, 164, 0.08) !important;
+    color: #ffffff !important;
+    border-color: #0ea5a4 !important;
   }
 
-  /* Delete button (uses btn-delete-review) */
   .review-footer .btn-delete-review {
-    color: #F04D43;
-    border-color: #F04D43;
+    color: #d62828 !important;
+    border-color: #d62828 !important;
   }
 
   .review-footer .btn-delete-review:hover,
   .review-footer .btn-delete-review:focus {
-    background-color: rgba(214, 40, 40, 0.08);
-    color: #f04c438a;
-    border-color: #F04D43;
+    background-color: rgba(214, 40, 40, 0.08) !important;
+    color: #ffffff !important;
+    border-color: #d62828 !important;
   }
 
-  /* ensure rules win over utilities */
-  .review-footer .btn-group .btn-outline-primary,
+  /* small transition polish */
+  .review-footer .btn-group .btn,
   .review-footer .btn-delete-review {
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+
+  /* Avatar circle container: fixed size, hide overflow */
+  .avatar-wrapper {
+    width: 36px !important;
+    height: 36px !important;
+    flex: 0 0 36px !important;
+    display: inline-block;
+    overflow: hidden;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+
+  /* Avatar image: cover the container, stay circular, don't exceed bounds */
+  .avatar-wrapper .review-avatar,
+  .avatar-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 50% !important;
+  }
+
+  /* Initials fallback keeps same size and centering */
+  .review-avatar.initials {
+    width: 100% !important;
+    height: 100% !important;
+    line-height: 36px !important;
+    font-size: 0.95rem !important;
+    text-align: center;
+    background: #6b21a8;
+    /* <-- change background color (solid) */
+    color: #fff !important;
+    /* <-- change initials text color */
+  }
+
+  .review-avatar.initials {
+    background: linear-gradient(135deg, #F04D43, #F06B43);
+  }
+
+  /* Ensure avatar doesn't add extra spacing that can push layout */
+  .author-block {
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>
 {% endblock %}
