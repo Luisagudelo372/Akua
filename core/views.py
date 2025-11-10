@@ -14,9 +14,10 @@ from .models import UserProfile, Place, Review
 from .forms import UserProfileForm, ReviewForm
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth import get_user_model
 from .models import Place
 
-
+User = get_user_model()
 
 # Cargar variables desde apikey.env
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'openAI.env')
@@ -191,6 +192,24 @@ def profile(request):
         'profile': profile,
     }
     return render(request, 'core/profile.html', context)
+
+def public_profile(request, username):
+    """
+    Public profile page for a user.
+    Shows name, avatar, interests, visited places and biography (read-only).
+    """
+    user_obj = get_object_or_404(User, username=username)
+    # try to access a related profile object if present
+    profile = getattr(user_obj, 'profile', None)
+    # you can also fetch related data like reviews if needed
+    user_reviews = getattr(user_obj, 'review_set', None)
+    context = {
+        'user_obj': user_obj,
+        'profile': profile,
+        # optionally show number of reviews or a list:
+        # 'reviews': user_obj.review_set.all()[:10],
+    }
+    return render(request, 'core/public_profile.html', context)
 
 def places(request):
     """Vista de listado de lugares"""

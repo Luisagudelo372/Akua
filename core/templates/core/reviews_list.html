@@ -27,31 +27,25 @@
 
   <div class="vstack gap-4">
     {% for review in reviews %}
-    <article class="card border-0 shadow-sm hover-lift" data-review-id="{{ review.pk }}" style="
-        border-left: 4px solid #F06B43 !important;
-        transition: all 0.3s ease;
-      ">
+    <article class="card border-0 shadow-sm hover-lift" data-review-id="{{ review.pk }}"
+      style="border-left: 4px solid #F06B43 !important;">
       <div class="card-body p-4">
         <div class="d-flex gap-4">
-          <!-- Imagen del lugar -->
+          <!-- place image / placeholder -->
           <div class="flex-shrink-0">
             {% if review.place.photo %}
             <img src="{{ review.place.photo.url }}" class="rounded-3 shadow-sm"
               style="width:120px;height:120px;object-fit:cover;border:3px solid rgba(240,107,67,0.1)"
               alt="{{ review.place.name }}">
             {% else %}
-            <div class="rounded-3 d-flex align-items-center justify-content-center" style="
-                width:120px;
-                height:120px;
-                background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));
-                border:3px solid rgba(240,107,67,0.1);
-              ">
+            <div class="rounded-3 d-flex align-items-center justify-content-center"
+              style="width:120px;height:120px;background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));border:3px solid rgba(240,107,67,0.1);">
               <i class="bi bi-image" style="font-size: 2rem; color: #F06B43;"></i>
             </div>
             {% endif %}
           </div>
 
-          <!-- Contenido de la reseña -->
+          <!-- review content -->
           <div class="flex-grow-1">
             <div class="d-flex align-items-start justify-content-between mb-2">
               <h3 class="h5 fw-bold mb-0" style="color: #2c3e50;">{{ review.title }}</h3>
@@ -66,7 +60,6 @@
               </div>
             </div>
 
-            <!-- Info del lugar -->
             <div class="mb-3">
               <span class="text-secondary me-2">
                 <i class="bi bi-geo-alt-fill" style="color: #F06B43;"></i>
@@ -75,52 +68,47 @@
               <span class="text-muted small">
                 {{ review.place.city }}, {{ review.place.department }}
               </span>
-              <span class="badge rounded-pill ms-2 px-3 py-1" style="
-                  background-color: rgba(240, 107, 67, 0.1);
-                  color: #F04D43;
-                  border: 1px solid rgba(240, 107, 67, 0.2);
-                ">
-                <i class="bi bi-tag-fill me-1"></i>{{ review.place.category }}
-              </span>
             </div>
 
-            <!-- Descripción -->
             <p class="text-secondary mb-3" style="line-height: 1.7;">
               {{ review.description|truncatewords:25 }}
             </p>
 
-            <!-- Footer con autor y fecha -->
+            <!-- footer: author + actions -->
             <div class="review-footer d-flex align-items-center justify-content-between pt-3 border-top">
               <div class="author-block d-flex align-items-center gap-2 flex-grow-1 min-w-0">
-                <div class="avatar-wrapper">
-                  {% if review.user.profile and review.user.profile.avatar %}
-                  <img src="{{ review.user.profile.avatar.url }}"
-                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
-                  {% elif review.user.profile and review.user.profile.photo %}
-                  <img src="{{ review.user.profile.photo.url }}"
-                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
-                  {% elif review.user.avatar %}
-                  <img src="{{ review.user.avatar.url }}"
-                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
-                  {% elif review.user.photo %}
-                  <img src="{{ review.user.photo.url }}"
-                    alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
-                  {% else %}
-                  <div class="rounded-circle review-avatar initials">
-                    {{ review.user.get_full_name|default:review.user.username|slice:":1"|upper }}
+                <a href="{% url 'public_profile' review.user.username %}"
+                  class="d-flex align-items-center text-decoration-none text-reset">
+                  <div class="avatar-wrapper">
+                    {% if review.user.profile and review.user.profile.avatar %}
+                    <img src="{{ review.user.profile.avatar.url }}"
+                      alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                    {% elif review.user.profile and review.user.profile.photo %}
+                    <img src="{{ review.user.profile.photo.url }}"
+                      alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                    {% elif review.user.avatar %}
+                    <img src="{{ review.user.avatar.url }}"
+                      alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                    {% elif review.user.photo %}
+                    <img src="{{ review.user.photo.url }}"
+                      alt="{{ review.user.get_full_name|default:review.user.username }}" class="review-avatar">
+                    {% else %}
+                    <div class="rounded-circle review-avatar initials">
+                      {{ review.user.get_full_name|default:review.user.username|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
                   </div>
-                  {% endif %}
-                </div>
 
-                <div class="author-meta min-w-0">
-                  <div class="fw-semibold text-truncate author-name">
-                    {{ review.user.get_full_name|default:review.user.username }}
+                  <div class="author-meta min-w-0 ms-2">
+                    <div class="fw-semibold text-truncate author-name">
+                      {{ review.user.get_full_name|default:review.user.username }}
+                    </div>
+                    <div class="text-muted small text-truncate author-time">
+                      <i class="bi bi-clock" style="color: #F06B43;"></i>
+                      {{ review.get_time_ago }}
+                    </div>
                   </div>
-                  <div class="text-muted small text-truncate author-time">
-                    <i class="bi bi-clock" style="color: #F06B43;"></i>
-                    {{ review.get_time_ago }}
-                  </div>
-                </div>
+                </a>
               </div>
 
               <div class="actions d-flex align-items-center gap-2 ms-4 flex-shrink-0">
@@ -146,12 +134,11 @@
             </div>
           </div>
         </div>
+      </div>
     </article>
     {% empty %}
-    <div class="card border-0 shadow-sm text-center p-5" style="
-          background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
-          border-left: 4px solid #F06B43 !important;
-        ">
+    <div class="card border-0 shadow-sm text-center p-5"
+      style="background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05)); border-left: 4px solid #F06B43 !important;">
       <div class="mb-3">
         <i class="bi bi-chat-left-quote" style="font-size: 4rem; color: #F06B43; opacity: 0.5;"></i>
       </div>
@@ -279,28 +266,28 @@
 
   /* --- restore button colors with higher specificity so utilities don't override them --- */
   .review-footer .btn-group .btn-outline-primary {
-    color: #0ea5a4 !important;
-    border-color: #0ea5a4 !important;
+    color: #F0A843 !important;
+    border-color: #F0A843 !important;
     background-color: transparent !important;
   }
 
   .review-footer .btn-group .btn-outline-primary:hover,
   .review-footer .btn-group .btn-outline-primary:focus {
     background-color: rgba(14, 165, 164, 0.08) !important;
-    color: #ffffff !important;
-    border-color: #0ea5a4 !important;
+    color: #e9c18a91 !important;
+    border-color: #F0A843 !important;
   }
 
   .review-footer .btn-delete-review {
-    color: #d62828 !important;
-    border-color: #d62828 !important;
+    color: #F04D43 !important;
+    border-color: #F04D43 !important;
   }
 
   .review-footer .btn-delete-review:hover,
   .review-footer .btn-delete-review:focus {
     background-color: rgba(214, 40, 40, 0.08) !important;
-    color: #ffffff !important;
-    border-color: #d62828 !important;
+    color: #dd726db7 !important;
+    border-color: #F04D43 !important;
   }
 
   /* small transition polish */

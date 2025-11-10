@@ -1,0 +1,90 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Perfil de {{ user_obj.get_full_name|default:user_obj.username }} — Akua{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #F06B43 !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-4">
+                        <div>
+                            {% if profile %}
+                            {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}"
+                                alt="{{ user_obj.get_full_name|default:user_obj.username }}" class="rounded-circle"
+                                style="width:120px;height:120px;object-fit:cover;">
+                            {% elif profile.photo %}
+                            <img src="{{ profile.photo.url }}"
+                                alt="{{ user_obj.get_full_name|default:user_obj.username }}" class="rounded-circle"
+                                style="width:120px;height:120px;object-fit:cover;">
+                            {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                style="width:120px;height:120px;background:linear-gradient(135deg,#F04D43,#F06B43);color:#fff;font-size:2rem;">
+                                {{ user_obj.get_full_name|default:user_obj.username|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                style="width:120px;height:120px;background:linear-gradient(135deg,#F04D43,#F06B43);color:#fff;font-size:2rem;">
+                                {{ user_obj.get_full_name|default:user_obj.username|slice:":1"|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h2 class="fw-bold mb-1">{{ user_obj.get_full_name|default:user_obj.username }}</h2>
+                            <p class="text-muted mb-2">@{{ user_obj.username }}</p>
+                            <p class="text-muted small mb-0">Miembro desde: {{ user_obj.date_joined|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-semibold">Intereses</h6>
+                            <p class="text-muted">
+                                {% if profile and profile.interests %}
+                                {{ profile.interests }}
+                                {% else %}
+                                <span class="text-secondary">No especificado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-semibold">Lugares visitados</h6>
+                            <p class="text-muted">
+                                {% if profile and profile.visited_places %}
+                                {{ profile.visited_places }}
+                                {% else %}
+                                <span class="text-secondary">No especificado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="fw-semibold">Biografía</h6>
+                            <p class="text-muted">
+                                {% if profile and profile.biography %}
+                                {{ profile.biography }}
+                                {% else %}
+                                <span class="text-secondary">No hay biografía pública</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-end">
+                        <a href="{% url 'reviews' %}" class="btn btn-outline-secondary rounded-pill">Volver a
+                            reseñas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
