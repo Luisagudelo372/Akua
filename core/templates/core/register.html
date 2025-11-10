@@ -2,40 +2,64 @@
 
 {% block title %}Sign Up — Akua{% endblock %}
 {% block content %}
-<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
-    <div class="bg-white rounded-2xl shadow-card border w-full max-w-2xl p-6">
-        <h1 class="text-2xl font-bold mb-4">Create your account</h1>
-        <form method="post" action="{% url 'register' %}" class="grid grid-cols-1 md:grid-cols-2 gap-6">{% csrf_token %}
-            <div>
-                <label class="text-sm">First name</label>
-                <input name="first_name" class="w-full border rounded-lg px-3 py-2">
+<section class="min-vh-100 d-flex align-items-center justify-content-center bg-gradient-akua">
+    <div class="card shadow-lg rounded-4" style="max-width: 720px; width: 100%;">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                <span class="navbar-brand-logo"><i class="bi bi-leaf-fill"></i></span>
+                <strong>Akua</strong>
             </div>
-            <div>
-                <label class="text-sm">Last name</label>
-                <input name="last_name" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-                <label class="text-sm">Email</label>
-                <input type="email" name="email" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-                <label class="text-sm">Username</label>
-                <input name="username" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-                <label class="text-sm">Password</label>
-                <input type="password" name="password1" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div>
-                <label class="text-sm">Repeat password</label>
-                <input type="password" name="password2" class="w-full border rounded-lg px-3 py-2">
-            </div>
-            <div class="md:col-span-2 flex items-center gap-2">
-                <input type="checkbox" class="size-4 rounded border">
-                <span class="text-sm">I agree to the Privacy Policy</span>
-            </div>
-            <button class="md:col-span-2 rounded-lg py-2.5 text-white bg-gradient-to-r from-akua-orange to-akua-pink font-semibold">Create account</button>
-        </form>
+
+            <h1 class="h4 fw-bold text-center mb-1">Create your account</h1>
+            <p class="text-center text-secondary small mb-4">Join Akua to share and discover travel experiences</p>
+
+            <form method="post" action="{% url 'register' %}" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <label class="form-label small">First name</label>
+                    <input name="first_name" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small">Last name</label>
+                    <input name="last_name" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small">Username</label>
+                    <input name="username" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small">Password</label>
+                    <input type="password" name="password1" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small">Repeat password</label>
+                    <input type="password" name="password2" class="form-control" required>
+                </div>
+
+                <div class="col-12 d-flex align-items-center gap-2">
+                    <input type="checkbox" class="form-check-input" id="agree" required>
+                    <label for="agree" class="form-check-label small">I agree to the Privacy Policy</label>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-akua w-100">Create account</button>
+                </div>
+
+                <div class="col-12 text-center">
+                    <p class="small text-secondary mb-0">Already have an account? <a href="{% url 'login' %}">Sign in
+                            here</a></p>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
