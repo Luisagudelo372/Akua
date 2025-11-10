@@ -27,25 +27,25 @@
 
   <div class="vstack gap-4">
     {% for review in reviews %}
-    <article class="card border-0 shadow-sm hover-lift" style="
-      border-left: 4px solid #F06B43 !important;
-      transition: all 0.3s ease;
-    ">
+    <article class="card border-0 shadow-sm hover-lift" data-review-id="{{ review.pk }}" style="
+        border-left: 4px solid #F06B43 !important;
+        transition: all 0.3s ease;
+      ">
       <div class="card-body p-4">
         <div class="d-flex gap-4">
           <!-- Imagen del lugar -->
           <div class="flex-shrink-0">
             {% if review.place.photo %}
             <img src="{{ review.place.photo.url }}" class="rounded-3 shadow-sm"
-              style="width:120px;height:120px;object-fit:cover;border:3px solid rgba(240,107,67,0.1)" 
+              style="width:120px;height:120px;object-fit:cover;border:3px solid rgba(240,107,67,0.1)"
               alt="{{ review.place.name }}">
             {% else %}
             <div class="rounded-3 d-flex align-items-center justify-content-center" style="
-              width:120px;
-              height:120px;
-              background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));
-              border:3px solid rgba(240,107,67,0.1);
-            ">
+                width:120px;
+                height:120px;
+                background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));
+                border:3px solid rgba(240,107,67,0.1);
+              ">
               <i class="bi bi-image" style="font-size: 2rem; color: #F06B43;"></i>
             </div>
             {% endif %}
@@ -57,12 +57,12 @@
               <h3 class="h5 fw-bold mb-0" style="color: #2c3e50;">{{ review.title }}</h3>
               <div class="rating d-flex gap-1">
                 {% for i in "12345" %}
-                  {% if forloop.counter <= review.qualification %}
-                    <i class="bi bi-star-fill" style="color: #F0A843; font-size: 1.1rem;"></i>
+                {% if forloop.counter <= review.qualification %} <i class="bi bi-star-fill"
+                  style="color: #F0A843; font-size: 1.1rem;"></i>
                   {% else %}
-                    <i class="bi bi-star" style="color: #F0A843; font-size: 1.1rem;"></i>
+                  <i class="bi bi-star" style="color: #F0A843; font-size: 1.1rem;"></i>
                   {% endif %}
-                {% endfor %}
+                  {% endfor %}
               </div>
             </div>
 
@@ -76,10 +76,10 @@
                 {{ review.place.city }}, {{ review.place.department }}
               </span>
               <span class="badge rounded-pill ms-2 px-3 py-1" style="
-                background-color: rgba(240, 107, 67, 0.1);
-                color: #F04D43;
-                border: 1px solid rgba(240, 107, 67, 0.2);
-              ">
+                  background-color: rgba(240, 107, 67, 0.1);
+                  color: #F04D43;
+                  border: 1px solid rgba(240, 107, 67, 0.2);
+                ">
                 <i class="bi bi-tag-fill me-1"></i>{{ review.place.category }}
               </span>
             </div>
@@ -90,53 +90,61 @@
             </p>
 
             <!-- Footer con autor y fecha -->
-            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
-              <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle d-flex align-items-center justify-content-center" style="
-                  width:36px;
-                  height:36px;
-                  background: linear-gradient(135deg, #F04D43, #F06B43);
-                  color: white;
-                  font-weight: 600;
-                ">
-                  {% if review.user.get_full_name %}
-                    {{ review.user.get_full_name|slice:":1"|upper }}
-                  {% else %}
-                    {{ review.user.username|slice:":1"|upper }}
-                  {% endif %}
+            <div class="review-footer d-flex flex-wrap align-items-center justify-content-between pt-3 border-top">
+              <div class="author-block d-flex align-items-center gap-2 flex-grow-1 min-w-0">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                  style="width:36px;height:36px;background: linear-gradient(135deg, #F04D43, #F06B43);color: white;font-weight: 600;flex: 0 0 36px;">
+                  {{ review.user.get_full_name|slice:":1"|default:review.user.username|slice:":1"|upper }}
                 </div>
-                <div>
-                  <div class="fw-semibold" style="font-size: 0.9rem; color: #2c3e50;">
+
+                <div class="author-meta min-w-0">
+                  <div class="fw-semibold text-truncate" style="color:#2c3e50; max-width:220px;">
                     {{ review.user.get_full_name|default:review.user.username }}
                   </div>
-                  <div class="text-muted small">
+                  <div class="text-muted small text-truncate" style="max-width:220px;">
                     <i class="bi bi-clock" style="color: #F06B43;"></i>
                     {{ review.get_time_ago }}
                   </div>
                 </div>
               </div>
 
-              <!-- Botón de ver más (opcional) -->
-              <a href="{% url 'place_detail' review.place.slug %}" 
-                 class="btn btn-sm rounded-pill" 
-                 style="
-                   background-color: rgba(240, 107, 67, 0.1);
-                   color: #F04D43;
-                   border: none;
-                   font-weight: 600;
-                 ">
-                <i class="bi bi-arrow-right-circle me-1"></i>Ver lugar
-              </a>
+              <!-- Right side: keep everything on one line and avoid pushing -->
+              <div class="d-flex align-items-center gap-2 flex-shrink-0" style="white-space: nowrap;">
+                <a href="{% url 'place_detail' review.place.slug %}" class="btn btn-sm rounded-pill" style="
+                      background-color: rgba(240, 107, 67, 0.1);
+                      color: #F04D43;
+                      border: none;
+                      font-weight: 600;
+                    ">
+                  <i class="bi bi-arrow-right-circle me-1"></i>Ver lugar
+                </a>
+
+                {% if user.is_authenticated and review.user == user %}
+                <!-- compact icon-only action buttons to avoid pushing layout -->
+                <div class="btn-group" role="group" aria-label="Acciones reseña">
+                  <a href="{% url 'edit_review' review.pk %}" class="btn btn-sm btn-outline-primary"
+                    title="Editar reseña">
+                    <i class="bi bi-pencil-fill"></i>
+                  </a>
+
+                  <!-- trigger modal; data-url used by script -->
+                  <button type="button" class="btn btn-sm btn-outline-danger btn-delete-review"
+                    data-url="{% url 'delete_review' review.pk %}" data-review-id="{{ review.pk }}"
+                    data-bs-toggle="modal" data-bs-target="#deleteReviewModal" title="Eliminar reseña">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
-      </div>
     </article>
     {% empty %}
     <div class="card border-0 shadow-sm text-center p-5" style="
-      background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
-      border-left: 4px solid #F06B43 !important;
-    ">
+          background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 169, 147, 0.05));
+          border-left: 4px solid #F06B43 !important;
+        ">
       <div class="mb-3">
         <i class="bi bi-chat-left-quote" style="font-size: 4rem; color: #F06B43; opacity: 0.5;"></i>
       </div>
@@ -150,14 +158,113 @@
   </div>
 </div>
 
+<!-- Delete confirmation modal (uses Bootstrap 5) -->
+<div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-labelledby="deleteReviewModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="deleteReviewForm">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteReviewModalLabel">Eliminar reseña</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro que quieres eliminar esta reseña? Esta acción no se puede deshacer.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <!-- standard submit: will POST to delete URL set when modal opens -->
+          <button type="submit" id="confirmDeleteBtn" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const deleteModalEl = document.getElementById('deleteReviewModal')
+    if (!deleteModalEl) return
+    const deleteForm = document.getElementById('deleteReviewForm')
+
+    // when modal opens, Bootstrap provides event.relatedTarget (the button that triggered it)
+    deleteModalEl.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget
+      if (!button) return
+      const url = button.getAttribute('data-url') || ''
+      const reviewId = button.getAttribute('data-review-id') || ''
+      deleteForm.action = url
+      // keep review id on form for optional client-side removal after submit
+      deleteForm.dataset.reviewId = reviewId
+    })
+
+    // Optional: if you want to remove the review element from the DOM after a successful normal submit,
+    // you can inspect the response on the server side and redirect back to the list; for AJAX remove,
+    // implement fetch() submit here. Start with normal POST to confirm server-side view works.
+    console.log('Delete modal script initialized, delete buttons:', document.querySelectorAll('.btn-delete-review').length)
+  })()
+</script>
+
 <style>
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .review-footer .author-meta {
+    min-width: 0;
   }
-  
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(240, 107, 67, 0.15) !important;
+
+  .review-footer .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .review-footer {
+    gap: 0.75rem;
+    /* adjust value to taste (0.5rem = ms-2, 0.75rem = ms-3-ish) */
+  }
+
+  /* Fallback / forced: increase left margin on actions if a utility class overrides it */
+  .review-footer .actions {
+    margin-left: 1rem !important;
+    /* tweak value and remove !important later if not needed */
+  }
+
+  @media (max-width: 576px) {
+    .review-footer .author-meta>div {
+      max-width: 140px;
+    }
+  }
+
+  .review-footer .btn-group .btn-outline-primary {
+    color: #F08A43;
+    /* text / border color */
+    border-color: #F08A43;
+  }
+
+  .review-footer .btn-group .btn-outline-primary:hover,
+  .review-footer .btn-group .btn-outline-primary:focus {
+    background-color: rgba(14, 165, 164, 0.08);
+    /* subtle hover bg */
+    color: #f08b43da;
+    border-color: #F08A43;
+  }
+
+  /* Delete button (uses btn-delete-review) */
+  .review-footer .btn-delete-review {
+    color: #F04D43;
+    border-color: #F04D43;
+  }
+
+  .review-footer .btn-delete-review:hover,
+  .review-footer .btn-delete-review:focus {
+    background-color: rgba(214, 40, 40, 0.08);
+    color: #f04c438a;
+    border-color: #F04D43;
+  }
+
+  /* ensure rules win over utilities */
+  .review-footer .btn-group .btn-outline-primary,
+  .review-footer .btn-delete-review {
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
 </style>
 {% endblock %}

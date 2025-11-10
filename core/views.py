@@ -84,6 +84,36 @@ def reviews(request):
     }
     return render(request, 'core/reviews_list.html', context)
 
+@login_required
+def edit_review(request, pk):
+    review = get_object_or_404(Review, pk=pk)
+    if review.user != request.user:
+        messages.error(request, "No tienes permiso para editar esta reseña.")
+        return redirect('reviews')
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reseña actualizada correctamente.")
+            return redirect('reviews')
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, 'core/write_review.html', {'form': form, 'editing': True})
+
+@login_required
+def delete_review(request, pk):
+    review = get_object_or_404(Review, pk=pk)
+    if review.user != request.user:
+        messages.error(request, "No tienes permiso para eliminar esta reseña.")
+        return redirect('reviews')
+
+    if request.method == 'POST':
+        review.delete()
+        messages.success(request, "Reseña eliminada.")
+        return redirect('reviews')
+
 # Inicializar cliente de OpenAI con la API key del archivo .env
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 

@@ -24,11 +24,12 @@
                         -webkit-background-clip: text;
                         -webkit-text-fill-color: transparent;
                         background-clip: text;
-                    ">Write a Review</h2>
+                    ">{% if editing or form.instance.pk %}Editar Reseña{% else %}Write a Review{% endif %}</h2>
 
                     {% if messages %}
                     {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" style="
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert"
+                        style="
                         border-left: 4px solid #F06B43;
                     ">
                         <i class="bi bi-check-circle-fill me-2" style="color: #F06B43;"></i>
@@ -38,11 +39,13 @@
                     {% endfor %}
                     {% endif %}
 
-                    <form method="post" action="{% url 'write_review' %}">
+                    <form method="post"
+                        action="{% if editing or form.instance.pk %}{% url 'edit_review' form.instance.pk %}{% else %}{% url 'write_review' %}{% endif %}">
                         {% csrf_token %}
 
                         <div class="mb-4">
-                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold"
+                                style="color: #2c3e50;">
                                 Título de la Reseña
                                 <span style="color: #F04388;">*</span>
                             </label>
@@ -55,7 +58,8 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.place.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
+                            <label for="{{ form.place.id_for_label }}" class="form-label fw-semibold"
+                                style="color: #2c3e50;">
                                 Lugar
                                 <span style="color: #F04388;">*</span>
                             </label>
@@ -68,7 +72,8 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.qualification.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
+                            <label for="{{ form.qualification.id_for_label }}" class="form-label fw-semibold"
+                                style="color: #2c3e50;">
                                 Calificación
                                 <span style="color: #F04388;">*</span>
                             </label>
@@ -79,13 +84,14 @@
                             </div>
                             {% endif %}
                             <div class="form-text">
-                                <i class="bi bi-star-fill" style="color: #F0A843;"></i> 
+                                <i class="bi bi-star-fill" style="color: #F0A843;"></i>
                                 Califica tu experiencia de 1 a 5 estrellas
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold" style="color: #2c3e50;">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold"
+                                style="color: #2c3e50;">
                                 Tu Experiencia
                                 <span style="color: #F04388;">*</span>
                             </label>
@@ -102,7 +108,11 @@
 
                         <div class="d-flex gap-3">
                             <button type="submit" class="btn btn-akua rounded-3 fw-semibold px-4 shadow-sm">
-                                <i class="bi bi-send me-2"></i>Publicar Reseña
+                                {% if editing or form.instance.pk %}
+                                <i class="bi bi-send me-2"></i> Guardar cambios
+                                {% else %}
+                                <i class="bi bi-send me-2"></i> Publicar Reseña
+                                {% endif %}
                             </button>
                             <a href="{% url 'reviews' %}" class="btn btn-outline-secondary rounded-3" style="
                                 border-color: #dee2e6;
