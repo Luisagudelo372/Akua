@@ -22,7 +22,7 @@
         ">Descubre Colombia</span>
       </h1>
       <p class="lead text-muted">Explora los destinos más increíbles del país</p>
-      
+
       <!-- Decoración -->
       <div class="d-flex justify-content-center gap-2 mt-3">
         <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg, #F04D43, #F06B43);">
@@ -38,8 +38,46 @@
     </div>
   </div>
 </div>
+</div>
 
 <div class="container py-5">
+  <!-- Filter row: single select (add) on the left + selected-pill list on the right -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <label for="categorySelect" class="mb-0 small text-muted">Filtrar</label>
+      <div class="input-group input-group-sm" style="width:260px;">
+        <select id="categorySelect" class="form-select rounded-pill">
+          <option value="">Seleccionar categoría...</option>
+          {% for cat, is_selected in categories %}
+          {% if not is_selected %}
+          <option value="{{ cat }}">{{ cat }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <small id="filterHint" class="text-muted small">Puedes añadir hasta 4 filtros</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <!-- selected filters pills will be rendered here -->
+      <div id="activeFilters" class="d-flex gap-2 align-items-center">
+        {% comment %} render existing selected filters as pills {% endcomment %}
+        {% for sel in selected_category %}
+        <div class="filter-pill d-flex align-items-center gap-2 px-2 py-1 rounded-pill bg-white border"
+          data-filter="{{ sel }}">
+          <span class="small text-muted">{{ sel }}</span>
+          <button type="button" class="btn-close btn-sm ms-1 remove-filter" aria-label="Remove"
+            data-filter="{{ sel }}"></button>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if selected_category %}
+      <a href="{% url 'places' %}" id="clearFilters" class="btn btn-sm btn-outline-secondary ms-2">Limpiar</a>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="row g-4">
     {% for place in places %}
     <div class="col-md-6 col-lg-4">
@@ -47,19 +85,19 @@
         <a href="{% url 'place_detail' place.slug %}" class="text-decoration-none">
           <div class="position-relative">
             {% if place.photo %}
-            <img src="{{ place.photo.url }}" class="card-img-top" alt="{{ place.name }}" 
-                 style="height: 250px; object-fit: cover;">
+            <img src="{{ place.photo.url }}" class="card-img-top" alt="{{ place.name }}"
+              style="height: 250px; object-fit: cover;">
             {% else %}
-            <div class="d-flex align-items-center justify-content-center" 
-                 style="height: 250px; background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));">
+            <div class="d-flex align-items-center justify-content-center"
+              style="height: 250px; background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 169, 147, 0.1));">
               <i class="bi bi-image" style="font-size: 3rem; color: #F06B43;"></i>
             </div>
             {% endif %}
-            
+
             <!-- Overlay gradiente sutil -->
-            <div class="position-absolute top-0 start-0 w-100 h-100" 
-                 style="background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);"></div>
-            
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+              style="background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 100%);"></div>
+
             <!-- Badge de rating flotante -->
             {% if place.rating_average > 0 %}
             <div class="position-absolute top-0 end-0 m-3">
@@ -72,12 +110,12 @@
             </div>
             {% endif %}
           </div>
-          
+
           <div class="card-body p-4">
             <h5 class="card-title text-dark fw-bold mb-2" style="transition: color 0.2s;">
               {{ place.name }}
             </h5>
-            
+
             {% if place.city or place.department %}
             <p class="text-muted small mb-3">
               <i class="bi bi-pin-map-fill" style="color: #F06B43;"></i>
@@ -86,11 +124,11 @@
               {% if place.department %}{{ place.department }}{% endif %}
             </p>
             {% endif %}
-            
+
             <p class="card-text text-secondary mb-3" style="font-size: 0.95rem;">
               {{ place.short_description|truncatewords:20 }}
             </p>
-            
+
             <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
               {% if place.category %}
               <span class="badge bg-light border px-3 py-2" style="
@@ -100,7 +138,7 @@
                 <i class="bi bi-tag-fill"></i> {{ place.category }}
               </span>
               {% endif %}
-              
+
               {% if place.estimated_cost > 0 %}
               <span class="fw-bold" style="
                 color: #F04D43;
@@ -110,7 +148,7 @@
               </span>
               {% endif %}
             </div>
-            
+
             <!-- Botón de ver más -->
             <div class="mt-3">
               <span class="btn btn-sm w-100 rounded-pill" style="
@@ -141,34 +179,143 @@
   </div>
 </div>
 
+<script>
+  // filter add/remove behavior (single-select add + pill UI, max 4 filters)
+  (function () {
+    const sel = document.getElementById('categorySelect')
+    const activeFiltersEl = document.getElementById('activeFilters')
+    const maxFilters = 4
+
+    // read initial selected filters from rendered pills
+    function readCurrentFilters() {
+      return Array.from(activeFiltersEl.querySelectorAll('[data-filter]')).map(el => el.getAttribute('data-filter'))
+    }
+
+    // helper to build url with array of categories
+    function buildUrlWithFilters(filters) {
+      const params = new URLSearchParams(window.location.search)
+      // remove existing category params
+      params.delete('category')
+      filters.forEach(f => params.append('category', f))
+      const base = window.location.pathname
+      const qs = params.toString()
+      return base + (qs ? '?' + qs : '')
+    }
+
+    // add filter (from select)
+    if (sel) {
+      sel.addEventListener('change', function () {
+        const val = this.value
+        if (!val) return
+        const current = readCurrentFilters()
+        if (current.includes(val)) return
+        if (current.length >= maxFilters) {
+          showTempMessage('Has alcanzado el máximo de 4 filtros', 3000)
+          this.value = ''
+          return
+        }
+        current.push(val)
+        // navigate with new query
+        window.location.href = buildUrlWithFilters(current)
+      })
+    }
+
+    // remove filter (delegation)
+    activeFiltersEl.addEventListener('click', function (e) {
+      const btn = e.target.closest('.remove-filter')
+      if (!btn) return
+      const toRemove = btn.getAttribute('data-filter')
+      const current = readCurrentFilters().filter(f => f !== toRemove)
+      window.location.href = buildUrlWithFilters(current)
+    })
+
+    // small temporary message area
+    const msgEl = document.createElement('div')
+    msgEl.id = 'filterMsg'
+    msgEl.style.position = 'fixed'
+    msgEl.style.right = '18px'
+    msgEl.style.bottom = '18px'
+    msgEl.style.zIndex = 1055
+    document.body.appendChild(msgEl)
+
+    function showTempMessage(text, timeout = 2500) {
+      msgEl.innerHTML = `<div class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">${text}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>`
+      setTimeout(() => { msgEl.innerHTML = '' }, timeout)
+    }
+  })()
+</script>
+
 <style>
+  /* existing card hover (kept) */
   .hover-lift {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
   }
-  
+
   .hover-lift:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 24px rgba(240, 107, 67, 0.15) !important;
     border-color: rgba(240, 107, 67, 0.1);
   }
-  
+
   .card a {
     color: inherit;
   }
-  
+
   .card a:hover .card-title {
     color: #F06B43 !important;
   }
-  
-  /* Animación del botón */
+
   .card:hover .btn {
     background: linear-gradient(135deg, #F06B43, #F08A43) !important;
     transform: scale(1.02);
   }
-  
+
   .btn {
     transition: all 0.3s ease;
+  }
+
+  /* filter pills */
+  #activeFilters {
+    min-height: 36px;
+  }
+
+  .filter-pill {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 6px rgba(16, 24, 32, 0.03);
+  }
+
+  .filter-pill .btn-close {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* input hint */
+  #filterHint {
+    color: rgba(44, 62, 80, 0.6);
+  }
+
+  /* responsive: collapse pills under select on small screens */
+  @media (max-width: 576px) {
+    .d-flex.justify-content-between.mb-4 {
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    #activeFilters {
+      order: 2;
+      width: 100%;
+    }
+
+    #categorySelect {
+      width: 100% !important;
+    }
   }
 </style>
 {% endblock %}

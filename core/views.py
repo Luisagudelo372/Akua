@@ -212,11 +212,57 @@ def public_profile(request, username):
     return render(request, 'core/public_profile.html', context)
 
 def places(request):
-    """Vista de listado de lugares"""
-    places_list = Place.objects.all()
-    
+    # collect selected categories (supports repeated ?category=A&category=B and comma lists)
+    selected = request.GET.getlist('category') or []
+    if not selected and request.GET.get('category'):
+        selected = [s.strip() for s in request.GET.get('category').split(',') if s.strip()]
+
+    # remove duplicates while preserving order (avoid duplicated pills)
+    from collections import OrderedDict
+    selected = list(OrderedDict.fromkeys([s for s in selected if s]))
+
+    qs = Place.objects.all()
+
+    # detect whether Place has a ManyToManyField named 'categories'
+    has_m2m = False
+    try:
+        Place._meta.get_field('categories')
+        has_m2m = True
+    except Exception:
+        has_m2m = False
+
+    if selected:
+        if has_m2m:
+            # require place to have at least all selected categories (AND)
+            qs = qs.annotate(
+                _match_count=Count('categories', filter=Q(categories__name__in=selected), distinct=True)
+            ).filter(_match_count=len(selected))
+        else:
+            # assume categories are in a comma-separated 'category' text field; require each to appear (AND)
+            for cat in selected:
+                qs = qs.filter(category__icontains=cat)
+
+    # build list of available categories for the filter UI
+    if has_m2m:
+        Category = Place._meta.get_field('categories').related_model
+        categories_list = list(Category.objects.values_list('name', flat=True).distinct())
+    else:
+        cats = set()
+        for raw in Place.objects.values_list('category', flat=True).distinct():
+            if not raw:
+                continue
+            for p in [x.strip() for x in raw.split(',')]:
+                if p:
+                    cats.add(p)
+        categories_list = sorted(cats)
+
+    # pass tuples (name, is_selected) to template to avoid fragile template comparisons
+    categories = [(c, c in selected) for c in categories_list]
+
     context = {
-        'places': places_list
+        'places': qs,
+        'categories': categories,
+        'selected_category': selected,  # list (truthy if any selected)
     }
     return render(request, 'core/places.html', context)
 
