@@ -8,30 +8,32 @@
     <h1 class="display-4 fw-bolder">Use the power of AI to make the most out of your next trip</h1>
 
     <div class="search-pill mt-4 w-100 w-md-75 w-lg-50">
-      <form class="row g-2 align-items-center px-2">
+      <form id="homeSearchForm" class="row g-2 align-items-center px-2">
         <div class="col-12 col-md">
           <small class="text-secondary d-block">Where</small>
-          <input class="form-control border-0 ps-0" placeholder="Search destinations">
+          <input id="whereInput" name="where" class="form-control border-0 ps-0" placeholder="Search destinations">
         </div>
 
         <div class="col-auto d-none d-md-flex align-items-center"><div class="divider"></div></div>
 
         <div class="col-12 col-md">
           <small class="text-secondary d-block">When</small>
-          <input class="form-control border-0 ps-0 js-date" placeholder="Select period">
+          <input id="whenInput" name="when" class="form-control border-0 ps-0 js-date" placeholder="Select period">
         </div>
 
         <div class="col-auto d-none d-md-flex align-items-center"><div class="divider"></div></div>
 
         <div class="col-12 col-md">
           <small class="text-secondary d-block">Type</small>
-          <select class="form-select border-0 ps-0">
-            <option>All</option><option>Nature</option><option>Culture</option>
+          <select id="typeInput" name="type" class="form-select border-0 ps-0">
+            <option value="">All</option>
+            <option value="Nature">Nature</option>
+            <option value="Culture">Culture</option>
           </select>
         </div>
 
         <div class="col-12 col-md-auto">
-          <a href="{% url 'donde_ir' %}" class="btn btn-akua rounded-pill px-4">Browse Trip</a>
+          <button type="submit" class="btn btn-akua rounded-pill px-4">Browse Trip</button>
         </div>
       </form>
     </div>
@@ -43,5 +45,25 @@
     <h2 class="h4 fw-semibold mb-0">Popular things to do</h2>
   </div>
 </section>
-{% endblock %}
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('homeSearchForm');
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Obtener solo el valor de "where"
+    const where = document.getElementById('whereInput').value.trim();
+    
+    // Construir la URL con parámetros
+    const params = new URLSearchParams();
+    if (where) params.append('where', where);
+    
+    // Redirigir a donde-ir con los parámetros
+    const url = "{% url 'donde_ir' %}" + (params.toString() ? '?' + params.toString() : '');
+    window.location.href = url;
+  });
+});
+</script>
+{% endblock %}

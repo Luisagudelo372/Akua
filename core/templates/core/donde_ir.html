@@ -51,7 +51,7 @@
                     Ciudad destino
                     <span style="color: #F04388;">*</span>
                   </label>
-                  <input type="text" name="ciudad" class="form-control" 
+                  <input type="text" id="ciudadInput" name="ciudad" class="form-control" 
                          placeholder="Ej. Medellín" required
                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                 </div>
@@ -62,7 +62,7 @@
                     País
                     <span style="color: #F04388;">*</span>
                   </label>
-                  <input type="text" name="pais" class="form-control" 
+                  <input type="text" id="paisInput" name="pais" class="form-control" 
                          placeholder="Ej. Colombia" required
                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                 </div>
@@ -109,7 +109,7 @@
                     Duración del viaje (días)
                     <span style="color: #F04388;">*</span>
                   </label>
-                  <input type="number" name="dias" min="1" class="form-control" required
+                  <input type="number" id="diasInput" name="dias" min="1" class="form-control" required
                          placeholder="Ej. 5"
                          style="border: 2px solid #e9ecef; transition: border-color 0.2s;">
                   <div class="form-text">
@@ -134,7 +134,7 @@
                 Intereses
               </h5>
 
-              <div class="d-flex flex-wrap gap-2">
+              <div class="d-flex flex-wrap gap-2" id="interesesContainer">
                 {% for tag in tags %}
                   <label class="badge-chip">
                     <input type="checkbox" name="intereses" value="{{ tag }}"> 
@@ -203,7 +203,7 @@
       </div>
 
       <!-- Contenedor para mostrar la respuesta de la IA -->
-      <div id="aiOutput" class="mt-4"></div>
+      <div id="aiOutput" class="mt-5"></div>
     </div>
   </div>
 </div>
@@ -316,10 +316,44 @@
       transform: translateY(0);
     }
   }
+
+  /* Tarjetas individuales de días 
+  .day-card {
+    border-left: 4px solid #F06B43 !important;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }*/
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  // Obtener parámetro "where" de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const where = urlParams.get('where');
+  
+  // Pre-llenar el formulario si hay datos del home
+  if (where) {
+    // Intentar separar ciudad y país del campo "where"
+    const whereParts = where.split(',').map(s => s.trim());
+    
+    if (whereParts.length >= 2) {
+      // Si tiene ciudad y país separados por coma
+      document.getElementById('ciudadInput').value = whereParts[0];
+      document.getElementById('paisInput').value = whereParts[1];
+    } else {
+      // Si solo tiene un valor (la ciudad)
+      document.getElementById('ciudadInput').value = where;
+      // Poner Colombia por defecto
+      document.getElementById('paisInput').value = 'Colombia';
+    }
+  }
+
+  // Manejo del envío del formulario
   const form = document.querySelector('#aiForm');
   const output = document.querySelector('#aiOutput');
 
@@ -368,6 +402,17 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `;
+
+     /*dias.forEach((dia, i) => {
+        output.innerHTML += `
+          <div class="card shadow-sm day-card border-0">
+            <div class="card-body">
+              <h5 class="fw-semibold mb-2"><i class="bi bi-sun me-2 text-warning"></i>Día ${i + 1}</h5>
+              <div style="white-space: pre-line; color: #495057;">${dia}</div>
+            </div>
+          </div>
+        `;
+      });  */
     } else {
       output.innerHTML = `
         <div class='alert alert-danger border-0 shadow-sm' style='border-left: 4px solid #F04388 !important;'>

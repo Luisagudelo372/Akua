@@ -13,36 +13,47 @@
             <h1 class="h4 fw-bold text-center mb-1">Create your account</h1>
             <p class="text-center text-secondary small mb-4">Join Akua to share and discover travel experiences</p>
 
+            <!-- Mensajes de error o éxito -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
             <form method="post" action="{% url 'register' %}" class="row g-3">
                 {% csrf_token %}
                 <div class="col-md-6">
-                    <label class="form-label small">First name</label>
+                    <label class="form-label small">First name <span class="text-danger">*</span></label>
                     <input name="first_name" class="form-control" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label small">Last name</label>
+                    <label class="form-label small">Last name <span class="text-danger">*</span></label>
                     <input name="last_name" class="form-control" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label small">Email</label>
+                    <label class="form-label small">Email <span class="text-danger">*</span></label>
                     <input type="email" name="email" class="form-control" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label small">Username</label>
+                    <label class="form-label small">Username <span class="text-danger">*</span></label>
                     <input name="username" class="form-control" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label small">Password</label>
-                    <input type="password" name="password1" class="form-control" required>
+                    <label class="form-label small">Password <span class="text-danger">*</span></label>
+                    <input type="password" name="password1" class="form-control" required minlength="8">
+                    <small class="form-text text-muted">Mínimo 8 caracteres</small>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label small">Repeat password</label>
-                    <input type="password" name="password2" class="form-control" required>
+                    <label class="form-label small">Repeat password <span class="text-danger">*</span></label>
+                    <input type="password" name="password2" class="form-control" required minlength="8">
                 </div>
 
                 <div class="col-12 d-flex align-items-center gap-2">
@@ -51,12 +62,11 @@
                 </div>
 
                 <div class="col-12">
-                    <button class="btn btn-akua w-100">Create account</button>
+                    <button type="submit" class="btn btn-akua w-100">Create account</button>
                 </div>
 
                 <div class="col-12 text-center">
-                    <p class="small text-secondary mb-0">Already have an account? <a href="{% url 'login' %}">Sign in
-                            here</a></p>
+                    <p class="small text-secondary mb-0">Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
                 </div>
             </form>
         </div>

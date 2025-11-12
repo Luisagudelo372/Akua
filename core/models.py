@@ -294,3 +294,99 @@ class Review(models.Model):
         else:
             years = diff.days // 365
             return f"{years} year{'s' if years != 1 else ''} ago"
+
+class Route(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='routes')
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    days = models.IntegerField()
+    budget = models.CharField(max_length=50)
+    ai_response = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.city}, {self.country} - {self.days}"
+
+    def get_complete_route_url(self):
+        """
+        Genera URL de Google Maps:
+        1. Tu ubicación actual
+        2. Ciudad destino (ej: Montería)
+        3. Lugares extraídos de la ruta
+        """
+        import re
+        from urllib.parse import quote
+
+        # Destino principal
+        destination = f"{self.city}, {self.country}"
+
+        # Lista para guardar los lugares en orden
+        places_ordered = []
+
+        # Dividir la respuesta en líneas
+        lines = self.ai_response.split('\n')
+
+        for line in lines:
+            # Buscar patrones como: - **Catedral de San Jerónimo**
+            matches = re.findall(r'\*\*([^*]+)\*\*', line)
+
+            for match in matches:
+                place_clean = match.strip()
+
+                # Palabras clave que NO son lugares
+                excluded_keywords = [
+                    'día', 'mañana', 'tarde', 'noche', 'costo', 'total', 'presupuesto',
+                    'descripción', 'recomendación', 'almuerzo', 'cena', 'desayuno',
+                    'actividades', 'entrada', 'aproximado', 'estimado', 'gratuita',
+                    'ruta', 'turística', 'personalizada', 'final', 'local',
+                    'típica', 'transporte', 'hospedaje', 'zona', 'visita'
+                ]
+
+                # Verificar si el texto contiene palabras excluidas
+                is_valid_place = True
+                place_lower = place_clean.lower()
+
+                for keyword in excluded_keywords:
+                    if keyword in place_lower:
+                        is_valid_place = False
+                        break
+
+                # Filtrar si es muy corto o tiene $ o números al inicio
+                if len(place_clean) < 5 or re.match(r'^[\$\d]', place_clean):
+                    is_valid_place = False
+
+                # Agregar solo si es válido y no está duplicado
+                if is_valid_place and place_clean not in places_ordered:
+                    places_ordered.append(place_clean)
+
+        # Tomar máximo 9 lugares
+        waypoints = places_ordered[:9]
+
+        # Construir URL
+        if waypoints:
+            # Codificar waypoints correctamente
+            waypoints_list = []
+            for place in waypoints:
+                # Agregar ciudad para mejor precisión
+                place_full = f"{place}, {self.city}, {self.country}"
+                waypoints_list.append(quote(place_full))
+
+            waypoints_str = "|".join(waypoints_list)
+            destination_encoded = quote(destination)
+
+            # URL correcta de Google Maps
+            url = (
+                f"https://www.google.com/maps/dir/?api=1"
+                f"&destination={destination_encoded}"
+                f"&waypoints={waypoints_str}"
+                f"&travelmode=driving"
+            )
+        else:
+            # Si no hay waypoints, solo ruta al destino
+            destination_encoded = quote(destination)
+            url = f"https://www.google.com/maps/dir/?api=1&destination={destination_encoded}&travelmode=driving"
+
+        return url
