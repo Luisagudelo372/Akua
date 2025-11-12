@@ -16,6 +16,8 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from .models import Place
+from serpapi import GoogleSearch
+import re
 
 User = get_user_model()
 
@@ -131,12 +133,45 @@ def generar_ruta_ai(request):
         barrio = request.POST.get("barrio")
 
         # Crear prompt con la información del usuario
-        prompt = (
+        prompt_usuario = (
             f"Genera una ruta turística personalizada en {ciudad}, {pais}, "
-            f"para {dias} días, con un presupuesto aproximado de {presupuesto} por persona. "
-            f"El viajero está interesado en {', '.join(intereses)} y eventos tipo {evento}. "
+            f"para {dias} días, con un presupuesto aproximado de {presupuesto} por persona cada día. "
+            f"El viajero está interesado en eventos tipo {evento}. "
             f"El hospedaje está en la zona {barrio}. "
-            f"Incluye actividades, costos estimados y lugares cercanos relevantes a mi zona de hospedaje."
+            f"Incluye actividades, costos estimados y lugares cercanos relevantes a mi zona de hospedaje." 
+            f"Necesito que devuelvas un texto conciso y completo con la información solicitada. " 
+            f"Separa los días de forma visible en la respuesta, y devuelve una propuesta para cada uno de los {dias} dias"
+            f"y termina siempre con una recomendación final o conclusión."
+        )
+
+        # Buscar información reciente en la web con SerpAPI
+        SERPAPI_KEY = os.getenv("SERPAPI_KEY")  # ← la clave estará en tu openAI.env
+        if not SERPAPI_KEY:
+            return JsonResponse({"error": "Falta la clave SERPAPI_KEY en el archivo .env"}, status=500)
+
+        search = GoogleSearch({
+            "q": f"turismo en {ciudad} {pais} {evento} {', '.join(intereses)} 2025 actividades lugares recomendados",
+            "api_key": SERPAPI_KEY,
+            "num": 5
+        })
+        results = search.get_dict()
+
+        # Extraer los resultados relevantes (títulos, descripciones y enlaces)
+        resumen_web = ""
+        fuentes = []
+        if "organic_results" in results:
+            for r in results["organic_results"][:5]:
+                title = r.get("title", "")
+                snippet = r.get("snippet", "")
+                link = r.get("link", "")
+                resumen_web += f"\n- {title}: {snippet}\n{link}\n"
+                fuentes.append(link)
+
+        # Combinar datos del usuario y resultados web
+        prompt_final = (
+            "Usa la siguiente información web reciente para construir una respuesta turística completa:\n"
+            f"{resumen_web}\n\n"
+            f"Solicitud del usuario:\n{prompt_usuario}"
         )
 
         # Llamar al modelo de OpenAI
@@ -144,9 +179,9 @@ def generar_ruta_ai(request):
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "Eres un asistente experto en turismo colombiano."},
-                {"role": "user", "content": prompt},
+                {"role": "user", "content": prompt_final},
             ],
-            max_tokens=500,
+            max_tokens=10000,
             temperature=0.8
         )
 
@@ -156,6 +191,7 @@ def generar_ruta_ai(request):
         return JsonResponse({"respuesta": resultado})
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
 
 def profile(request):
     # Si no está autenticado, redirigir al login
