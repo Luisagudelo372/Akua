@@ -67,7 +67,11 @@ def dashboard(request):
 
 def donde_ir(request):
     """Renderiza la página principal de búsqueda."""
-    return render(request, "core/donde_ir.html")
+    tags = [
+        "Naturaleza", "Aventura", "Cultura", "Gastronomía", "Vida nocturna",
+        "Relax", "Historia", "Deportes", "Arte", "Compras", "Familiar"
+    ]
+    return render(request, "core/donde_ir.html", {"tags": tags})
 
 
 def profile(request):
@@ -136,9 +140,9 @@ def generar_ruta_ai(request):
         prompt_usuario = (
             f"Genera una ruta turística personalizada en {ciudad}, {pais}, "
             f"para {dias} días, con un presupuesto aproximado de {presupuesto} por persona cada día. "
-            f"El viajero está interesado en eventos tipo {evento}. "
+            f"El viajero está interesado en eventos tipo {evento}, y tiene interés en {intereses}"
             f"El hospedaje está en la zona {barrio}. "
-            f"Incluye actividades, costos estimados y lugares cercanos relevantes a mi zona de hospedaje." 
+            f"Incluye actividades, costos estimados y lugares cercanos relevantes a la zona de hospedaje con nombres y direcciones." 
             f"Necesito que devuelvas un texto conciso y completo con la información solicitada. " 
             f"Separa los días de forma visible en la respuesta, y devuelve una propuesta para cada uno de los {dias} dias"
             f"y termina siempre con una recomendación final o conclusión."
@@ -148,12 +152,25 @@ def generar_ruta_ai(request):
         SERPAPI_KEY = os.getenv("SERPAPI_KEY")  # ← la clave estará en tu openAI.env
         if not SERPAPI_KEY:
             return JsonResponse({"error": "Falta la clave SERPAPI_KEY en el archivo .env"}, status=500)
+        
+        query = (
+            f"sitios turísticos, actividades y planes en {ciudad}, {pais} "
+            f"relacionados con {evento} y {', '.join(intereses)} "
+            f"con precios por persona, direcciones y recomendaciones actualizadas 2025"
+        )
 
-        search = GoogleSearch({
-            "q": f"turismo en {ciudad} {pais} {evento} {', '.join(intereses)} 2025 actividades lugares recomendados",
-            "api_key": SERPAPI_KEY,
-            "num": 5
-        })
+        params = {
+            "engine": "google",
+            "q": query,
+            "location": f"{ciudad}, {pais}",
+            "hl": "es",                        # Prioriza resultados en español
+            "gl": "co",                        # Geolocalización (ajústalo según el país)
+            "num": 15,                         # Máximo de resultados relevantes
+            "safe": "active",                  # Evita resultados inapropiados
+            "api_key": SERPAPI_KEY
+        }
+
+        search = GoogleSearch(params)
         results = search.get_dict()
 
         # Extraer los resultados relevantes (títulos, descripciones y enlaces)

@@ -317,18 +317,51 @@
     }
   }
 
-  /* Tarjetas individuales de días 
-  .day-card {
-    border-left: 4px solid #F06B43 !important;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    animation: fadeIn 0.6s ease;
+  .markdown-body {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.7;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }*/
+
+  .markdown-body h3, .markdown-body h4 {
+    color: #F04D43;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .markdown-body strong {
+    color: #000;
+  }
+
+  .markdown-body ul, .markdown-body ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .markdown-body li {
+    margin-bottom: 0.4rem;
+  }
+
+  .markdown-body p {
+    margin-bottom: 1rem;
+  }
+
+  .markdown-body hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 1rem 0;
+  }
+
+
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -338,8 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Loader mientras se genera la respuesta
     output.innerHTML = `
-      <div class='alert alert-secondary border-0 shadow-sm d-flex align-items-center' style='border-left: 4px solid #F06B43 !important;'>
+      <div class='alert alert-secondary border-0 shadow-sm d-flex align-items-center' 
+           style='border-left: 4px solid #F06B43 !important;'>
         <div class="spinner-border text-primary me-3" role="status" style="color: #F06B43 !important;">
           <span class="visually-hidden">Cargando...</span>
         </div>
@@ -351,51 +386,52 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const formData = new FormData(form);
-    const response = await fetch("{% url 'generar_ruta_ai' %}", {
-      method: "POST",
-      body: formData,
-      headers: { "X-CSRFToken": "{{ csrf_token }}" },
-    });
+    try {
+      const response = await fetch("{% url 'generar_ruta_ai' %}", {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data.respuesta) {
-      output.innerHTML = `
-        <div class='card shadow-sm border-0' style='border-left: 4px solid #F06B43 !important;'>
-          <div class='card-body p-4'>
+      if (data.respuesta) {
+        const raw = String(data.respuesta || '').trim();
+
+        // Convertir el Markdown a HTML con Marked
+        const rendered = marked.parse(raw, { breaks: true });
+        // Sanitizar el HTML
+        const html = DOMPurify.sanitize(rendered);
+
+        // Insertar el contenido con estilo
+        output.innerHTML = `
+          <div class="ai-response">
             <div class="d-flex align-items-center mb-3">
-              <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" style="
-                width: 48px;
-                height: 48px;
-                background: linear-gradient(135deg, #F04D43, #F06B43);
-                color: white;
-              ">
-                <i class="bi bi-map-fill"></i>
+              <span class="me-3 d-flex align-items-center justify-content-center rounded-circle" 
+                    style="width: 48px; height: 48px; background: linear-gradient(135deg, #F04D43, #F06B43); color: white;">
+                <i class="bi bi-map-fill fs-5"></i>
               </span>
-              <h5 class="fw-bold mb-0">Ruta sugerida por Akua</h5>
+              <h4 class="fw-bold mb-0">Ruta sugerida por Akua</h4>
             </div>
-            <div style="line-height: 1.8; color: #495057;">
-              ${data.respuesta.replace(/\n/g, '<br>')}
-            </div>
-          </div>
-        </div>
-      `;
-
-     /*dias.forEach((dia, i) => {
-        output.innerHTML += `
-          <div class="card shadow-sm day-card border-0">
-            <div class="card-body">
-              <h5 class="fw-semibold mb-2"><i class="bi bi-sun me-2 text-warning"></i>Día ${i + 1}</h5>
-              <div style="white-space: pre-line; color: #495057;">${dia}</div>
-            </div>
+            <div class="ai-content markdown-body">${html}</div>
           </div>
         `;
-      });  */
-    } else {
+           
+      } else {
+        output.innerHTML = `
+          <div class='alert alert-danger border-0 shadow-sm' 
+               style='border-left: 4px solid #F04388 !important;'>
+            <i class="bi bi-exclamation-triangle-fill me-2" style="color: #F04388;"></i>
+            <strong>Error:</strong> ${data.error || 'Error generando la ruta. Por favor intenta de nuevo.'}
+          </div>
+        `;
+      }
+    } catch (err) {
       output.innerHTML = `
-        <div class='alert alert-danger border-0 shadow-sm' style='border-left: 4px solid #F04388 !important;'>
+        <div class='alert alert-danger border-0 shadow-sm' 
+             style='border-left: 4px solid #F04388 !important;'>
           <i class="bi bi-exclamation-triangle-fill me-2" style="color: #F04388;"></i>
-          <strong>Error:</strong> ${data.error || 'Error generando la ruta. Por favor intenta de nuevo.'}
+          <strong>Error de conexión:</strong> No se pudo contactar con el servidor.
         </div>
       `;
     }
