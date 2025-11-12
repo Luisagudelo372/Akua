@@ -53,21 +53,13 @@
                     <small class="text-muted">{{ route.created_at|date:"d/m/Y" }}</small>
                   </div>
                   
-                  <!-- 👇 SOLO 2 BOTONES -->
+                  <!-- Solo 1 botón: Ver detalles -->
                   <div class="d-flex gap-2 mt-2">
                     <button class="btn btn-sm btn-outline-secondary" 
-                            onclick="showRouteDetails('{{ route.ai_response|escapejs }}')"
+                            onclick="showRouteDetails('{{ route.city }}', '{{ route.country }}', '{{ route.days }}', '{{ route.budget }}', '{{ route.ai_response|escapejs }}')"
                             style="border-color: #F06B43; color: #F06B43;">
                       <i class="bi bi-eye me-1"></i>Ver detalles
                     </button>
-                    
-                    <a href="{{ route.get_complete_route_url }}" 
-                       target="_blank"
-                       class="btn btn-sm"
-                       style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: white;"
-                       title="Ver ruta completa con lugares del itinerario">
-                      <i class="bi bi-map-fill me-1"></i>Ver ruta completa
-                    </a>
                   </div>
                 </div>
               {% endfor %}
@@ -147,26 +139,67 @@
   </div>
 </div>
 
-<!-- Modal para ver detalles de la ruta -->
+<!-- Modal mejorado para ver detalles de la ruta -->
 <div class="modal fade" id="routeModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header" style="border-bottom: 2px solid #F06B43;">
-        <h5 class="modal-title fw-bold" style="color: #F04D43;">
-          <i class="bi bi-map-fill me-2"></i>Detalles de la Ruta
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      <!-- Header mejorado -->
+      <div class="modal-header" style="
+        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+        color: white;
+        border: none;
+      ">
+        <div>
+          <h5 class="modal-title fw-bold mb-1">
+            <i class="bi bi-map-fill me-2"></i><span id="routeTitle">Detalles de la Ruta</span>
+          </h5>
+          <small id="routeSubtitle" style="opacity: 0.9;"></small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body" id="routeDetails" style="white-space: pre-line; line-height: 1.8;">
-        <!-- Los detalles se cargarán aquí -->
+      
+      <!-- Body mejorado -->
+      <div class="modal-body p-4" id="routeDetails">
+        <!-- Los detalles se cargarán aquí con formato mejorado -->
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function showRouteDetails(aiResponse) {
-  document.getElementById('routeDetails').innerHTML = aiResponse.replace(/\n/g, '<br>');
+function showRouteDetails(city, country, days, budget, aiResponse) {
+  // Actualizar título
+  document.getElementById('routeTitle').textContent = `${city}, ${country}`;
+  document.getElementById('routeSubtitle').textContent = `${days} días • ${budget}`;
+  
+  // Procesar el texto de la IA
+  let formattedText = aiResponse;
+  
+  // Convertir ### en títulos grandes (H3)
+  formattedText = formattedText.replace(/###\s*(.+)/g, '<h3 class="fw-bold mt-4 mb-3" style="color: #F04D43; border-bottom: 3px solid #F06B43; padding-bottom: 10px;"><i class="bi bi-signpost-fill me-2"></i>$1</h3>');
+  
+  // Convertir #### en títulos medianos (H4)
+  formattedText = formattedText.replace(/####\s*(.+)/g, '<h4 class="fw-semibold mt-3 mb-3" style="color: #2c3e50;"><i class="bi bi-calendar-day me-2" style="color: #F08A43;"></i>$1</h4>');
+  
+  // Convertir **texto** en negrita con color
+  formattedText = formattedText.replace(/\*\*(.+?)\*\*/g, '<strong style="color: #F06B43;">$1</strong>');
+  
+  // Convertir líneas que empiezan con - en bullets con íconos
+  formattedText = formattedText.replace(/^-\s+(.+)/gm, '<div class="mb-2 ps-3"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>$1</div>');
+  
+  // Convertir saltos de línea en <br>
+  formattedText = formattedText.replace(/\n/g, '<br>');
+  
+  // Agregar cards para mejor organización
+  formattedText = `
+    <div class="route-content" style="line-height: 1.8; color: #495057; font-size: 1.05rem;">
+      ${formattedText}
+    </div>
+  `;
+  
+  document.getElementById('routeDetails').innerHTML = formattedText;
+  
+  // Mostrar modal
   const modal = new bootstrap.Modal(document.getElementById('routeModal'));
   modal.show();
 }
@@ -186,18 +219,83 @@ function showRouteDetails(aiResponse) {
     background-color: rgba(240, 107, 67, 0.03);
   }
   
-  /* Hover para botón de ruta completa */
-  .btn-sm[href]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    transition: all 0.2s ease;
-  }
-  
   .btn-outline-secondary:hover {
     background-color: rgba(240, 107, 67, 0.1);
     border-color: #F04D43;
     color: #F04D43;
     transition: all 0.2s ease;
+  }
+  
+  /* Estilos para el modal mejorado */
+  .route-content h3 {
+    animation: fadeInDown 0.5s ease;
+  }
+  
+  .route-content h4 {
+    background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 138, 67, 0.05));
+    padding: 12px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #F08A43;
+    margin: 20px 0;
+    animation: fadeInLeft 0.5s ease;
+  }
+  
+  .route-content strong {
+    font-weight: 600;
+  }
+  
+  .route-content div {
+    padding-left: 10px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .route-content div:hover {
+    border-left-color: #F06B43;
+    background: rgba(240, 107, 67, 0.02);
+    padding-left: 15px;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Scrollbar personalizado para el modal */
+  .modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #F04D43, #F08A43);
+    border-radius: 10px;
+  }
+  
+  .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #F04D43;
   }
 </style>
 {% endblock %}
