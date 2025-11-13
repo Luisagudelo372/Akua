@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import UserProfile, Place, Review, Route
 from .forms import UserProfileForm, ReviewForm
-from django.contrib.auth import authenticate, login, logout, get_user_model  # ← AGREGAR get_user_model aquí
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import json
@@ -121,8 +121,8 @@ def register_view(request):
 
 @login_required
 def dashboard(request):
-    # Obtener rutas generadas del usuario
-    routes = Route.objects.filter(user=request.user)[:5]
+    # Obtener rutas generadas del usuario (ordenadas por más recientes)
+    routes = Route.objects.filter(user=request.user).order_by('-created_at')
     
     # Obtener lugares visitados
     profile = getattr(request.user, 'profile', None)
@@ -287,6 +287,7 @@ def delete_review(request, pk):
         return redirect('reviews')
 
 
+@login_required  # ← AGREGADO: Solo usuarios autenticados pueden generar rutas
 def generar_ruta_ai(request):
     """Toma las opciones del usuario y genera una respuesta de IA."""
     if request.method == "POST":
@@ -311,7 +312,7 @@ def generar_ruta_ai(request):
         )
 
         # Buscar información reciente en la web con SerpAPI
-        SERPAPI_KEY = os.getenv("SERPAPI_KEY")  # ← la clave estará en tu openAI.env
+        SERPAPI_KEY = os.getenv("SERPAPI_KEY")
         if not SERPAPI_KEY:
             return JsonResponse({"error": "Falta la clave SERPAPI_KEY en el archivo .env"}, status=500)
 
@@ -325,10 +326,10 @@ def generar_ruta_ai(request):
             "engine": "google",
             "q": query,
             "location": f"{ciudad}, {pais}",
-            "hl": "es",                        # Prioriza resultados en español
-            "gl": "co",                        # Geolocalización (ajústalo según el país)
-            "num": 15,                         # Máximo de resultados relevantes
-            "safe": "active",                  # Evita resultados inapropiados
+            "hl": "es",
+            "gl": "co",
+            "num": 15,
+            "safe": "active",
             "api_key": SERPAPI_KEY
         }
 
@@ -338,30 +339,44 @@ def generar_ruta_ai(request):
         resumen_web = ""
         fuentes = []
         if "organic_results" in results:
-                for r in results["organic_results"][:5]:
-                    title = r.get("title", "")
-                    snippet = r.get("snippet", "")
-                    link = r.get("link", "")
-                    resumen_web += f"\n- {title}: {snippet}\n{link}\n"
-                    fuentes.append(link)
+            for r in results["organic_results"][:5]:
+                title = r.get("title", "")
+                snippet = r.get("snippet", "")
+                link = r.get("link", "")
+                resumen_web += f"\n- {title}: {snippet}\n{link}\n"
+                fuentes.append(link)
 
         prompt_final = (
-                "Usa la siguiente información web reciente para construir una respuesta turística completa:\n"
-                f"{resumen_web}\n\n"
-                f"Solicitud del usuario:\n{prompt_usuario}"
-            )
+            "Usa la siguiente información web reciente para construir una respuesta turística completa:\n"
+            f"{resumen_web}\n\n"
+            f"Solicitud del usuario:\n{prompt_usuario}"
+        )
 
         response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "Eres un asistente experto en turismo colombiano."},
-                    {"role": "user", "content": prompt_final},
-                ],
-                max_tokens=10000,
-                temperature=0.7
-            )
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Eres un asistente experto en turismo colombiano."},
+                {"role": "user", "content": prompt_final},
+            ],
+            max_tokens=10000,
+            temperature=0.7
+        )
 
         resultado = response.choices[0].message.content
+
+        # 🆕 GUARDAR LA RUTA EN LA BASE DE DATOS
+        try:
+            Route.objects.create(
+                user=request.user,
+                city=ciudad,
+                country=pais,
+                days=int(dias),
+                budget=presupuesto,
+                ai_response=resultado
+            )
+        except Exception as e:
+            print(f"Error al guardar la ruta: {e}")
+            # Continuar aunque falle el guardado
 
         return JsonResponse({"respuesta": resultado})
 
