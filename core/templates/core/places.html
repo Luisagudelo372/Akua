@@ -36,6 +36,27 @@
         </span>
       </div>
     </div>
+    <!-- Buscador de lugares -->
+    <form method="get" action="{% url 'places' %}" class="mt-4">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden">
+            <span class="input-group-text bg-white border-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" name="q" class="form-control border-0" placeholder="Buscar un lugar..."
+              value="{{ search_query|default:'' }}">
+            <!-- Mantener categorías seleccionadas al buscar -->
+            {% for cat, is_selected in categories %}
+            {% if is_selected %}
+            <input type="hidden" name="category" value="{{ cat }}">
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </form>
+
   </div>
 </div>
 </div>
@@ -55,7 +76,7 @@
           {% endfor %}
         </select>
       </div>
-      <small id="filterHint" class="text-muted small">Puedes añadir hasta 4 filtros</small>
+      <small id="filterHint" class="text-muted small">Puedes añadir hasta 2 filtros</small>
     </div>
 
     <div class="d-flex align-items-center gap-2">
@@ -210,7 +231,7 @@
         const current = readCurrentFilters()
         if (current.includes(val)) return
         if (current.length >= maxFilters) {
-          showTempMessage('Has alcanzado el máximo de 4 filtros', 3000)
+          showTempMessage('Has alcanzado el máximo de 2 filtros', 3000)
           this.value = ''
           return
         }
@@ -316,6 +337,19 @@
     #categorySelect {
       width: 100% !important;
     }
+  }
+
+  /* Remove blue focus bar inside the search bar */
+  .input-group .form-control:focus {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+  }
+
+  /* Also remove the small blue line on the left of the input */
+  .input-group .input-group-text {
+    border: none !important;
+    box-shadow: none !important;
   }
 </style>
 {% endblock %}
