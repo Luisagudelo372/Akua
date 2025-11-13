@@ -25,6 +25,33 @@ load_dotenv(dotenv_path)
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
+# 🆕 FUNCIÓN AUXILIAR PARA ACTUALIZAR RATING (INCLUYE RATING INICIAL)
+def update_place_rating(place):
+    """
+    Actualiza el rating promedio de un lugar.
+    Incluye el rating inicial (ficticio) en el cálculo.
+    El rating inicial cuenta como 1 voto.
+    """
+    reviews = place.reviews.all()
+    
+    if reviews.exists():
+        # Sumar todas las calificaciones de reviews reales
+        total_sum = sum([r.qualification for r in reviews])
+        total_count = reviews.count()
+        
+        # SI el lugar tiene un rating inicial (ficticio), incluirlo como 1 voto
+        if place.rating_average > 0:
+            total_sum += float(place.rating_average)
+            total_count += 1
+        
+        # Calcular nuevo promedio
+        new_average = total_sum / total_count
+        place.rating_average = round(new_average, 2)
+    
+    place.save()
+    return place.rating_average
+
+
 def index(request):
     """Vista principal - Home con lugares top"""
     # Obtener los 6 lugares mejor calificados
@@ -121,8 +148,8 @@ def register_view(request):
 
 @login_required
 def dashboard(request):
-    # Obtener rutas generadas del usuario (ordenadas por más recientes)
-    routes = Route.objects.filter(user=request.user).order_by('-created_at')
+    # Obtener rutas generadas del usuario
+    routes = Route.objects.filter(user=request.user)[:5]
     
     # Obtener lugares visitados
     profile = getattr(request.user, 'profile', None)
@@ -222,13 +249,10 @@ def write_review(request):
             review.user = request.user
             review.save()
             
-            # Actualizar rating promedio del lugar
-            place = review.place
-            avg_rating = place.reviews.aggregate(Avg('qualification'))['qualification__avg']
-            place.rating_average = round(avg_rating, 2) if avg_rating else 0
-            place.save()
+            # 🆕 ACTUALIZAR RATING (INCLUYE RATING INICIAL)
+            new_rating = update_place_rating(review.place)
             
-            messages.success(request, '¡Tu reseña ha sido publicada exitosamente!')
+            messages.success(request, f'¡Tu reseña ha sido publicada! Nuevo rating: {new_rating}/5.0 ⭐')
             return redirect('reviews')
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
@@ -253,13 +277,10 @@ def edit_review(request, pk):
         if form.is_valid():
             form.save()
             
-            # Actualizar rating promedio
-            place = review.place
-            avg_rating = place.reviews.aggregate(Avg('qualification'))['qualification__avg']
-            place.rating_average = round(avg_rating, 2) if avg_rating else 0
-            place.save()
+            # 🆕 ACTUALIZAR RATING (INCLUYE RATING INICIAL)
+            new_rating = update_place_rating(review.place)
             
-            messages.success(request, "Reseña actualizada correctamente.")
+            messages.success(request, f"Reseña actualizada correctamente. Nuevo rating: {new_rating}/5.0 ⭐")
             return redirect('reviews')
     else:
         form = ReviewForm(instance=review)
@@ -278,94 +299,74 @@ def delete_review(request, pk):
         place = review.place
         review.delete()
         
-        # Actualizar rating promedio
-        avg_rating = place.reviews.aggregate(Avg('qualification'))['qualification__avg']
-        place.rating_average = round(avg_rating, 2) if avg_rating else 0
-        place.save()
+        # 🆕 ACTUALIZAR RATING (INCLUYE RATING INICIAL)
+        new_rating = update_place_rating(place)
         
-        messages.success(request, "Reseña eliminada.")
+        messages.success(request, f"Reseña eliminada. Nuevo rating: {new_rating}/5.0 ⭐")
         return redirect('reviews')
 
 
-@login_required  # ← AGREGADO: Solo usuarios autenticados pueden generar rutas
+@login_required
 def generar_ruta_ai(request):
     """Toma las opciones del usuario y genera una respuesta de IA."""
     if request.method == "POST":
-        ciudad = request.POST.get("ciudad")
-        pais = request.POST.get("pais")
-        presupuesto = request.POST.get("presupuesto")
-        dias = request.POST.get("dias")
-        intereses = request.POST.getlist("intereses")
-        evento = request.POST.get("evento")
-        barrio = request.POST.get("barrio")
-
-        # Crear prompt con la información del usuario
-        prompt_usuario = (
-            f"Genera una ruta turística personalizada en {ciudad}, {pais}, "
-            f"para {dias} días, con un presupuesto aproximado de {presupuesto} por persona cada día. "
-            f"El viajero está interesado en eventos tipo {evento}. "
-            f"El hospedaje está en la zona {barrio}. "
-            f"Incluye actividades, costos estimados y lugares cercanos relevantes a mi zona de hospedaje." 
-            f"Necesito que devuelvas un texto conciso y completo con la información solicitada. " 
-            f"Separa los días de forma visible en la respuesta, y devuelve una propuesta para cada uno de los {dias} dias"
-            f"y termina siempre con una recomendación final o conclusión."
-        )
-
-        # Buscar información reciente en la web con SerpAPI
-        SERPAPI_KEY = os.getenv("SERPAPI_KEY")
-        if not SERPAPI_KEY:
-            return JsonResponse({"error": "Falta la clave SERPAPI_KEY en el archivo .env"}, status=500)
-
-        query = (
-            f"sitios turísticos, actividades y planes en {ciudad}, {pais} "
-            f"relacionados con {evento} y {', '.join(intereses)} "
-            f"con precios por persona, direcciones y recomendaciones actualizadas 2025"
-        )
-
-        params = {
-            "engine": "google",
-            "q": query,
-            "location": f"{ciudad}, {pais}",
-            "hl": "es",
-            "gl": "co",
-            "num": 15,
-            "safe": "active",
-            "api_key": SERPAPI_KEY
-        }
-
-        search = GoogleSearch(params)
-        results = search.get_dict()
-
-        resumen_web = ""
-        fuentes = []
-        if "organic_results" in results:
-            for r in results["organic_results"][:5]:
-                title = r.get("title", "")
-                snippet = r.get("snippet", "")
-                link = r.get("link", "")
-                resumen_web += f"\n- {title}: {snippet}\n{link}\n"
-                fuentes.append(link)
-
-        prompt_final = (
-            "Usa la siguiente información web reciente para construir una respuesta turística completa:\n"
-            f"{resumen_web}\n\n"
-            f"Solicitud del usuario:\n{prompt_usuario}"
-        )
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Eres un asistente experto en turismo colombiano."},
-                {"role": "user", "content": prompt_final},
-            ],
-            max_tokens=10000,
-            temperature=0.7
-        )
-
-        resultado = response.choices[0].message.content
-
-        # 🆕 GUARDAR LA RUTA EN LA BASE DE DATOS
         try:
+            ciudad = request.POST.get("ciudad")
+            pais = request.POST.get("pais")
+            presupuesto = request.POST.get("presupuesto")
+            dias = request.POST.get("dias")
+            intereses = request.POST.getlist("intereses")
+            evento = request.POST.get("evento")
+            barrio = request.POST.get("barrio")
+
+            prompt_usuario = (
+                f"Genera una ruta turística personalizada en {ciudad}, {pais}, "
+                f"para {dias} días, con un presupuesto aproximado de {presupuesto} por persona cada día. "
+                f"El viajero está interesado en eventos tipo {evento}. "
+                f"El hospedaje está en la zona {barrio}. "
+                f"Incluye actividades, costos estimados y lugares cercanos relevantes a mi zona de hospedaje." 
+                f"Necesito que devuelvas un texto conciso y completo con la información solicitada. " 
+                f"Separa los días de forma visible en la respuesta, y devuelve una propuesta para cada uno de los {dias} dias"
+                f"y termina siempre con una recomendación final o conclusión."
+            )
+
+            SERPAPI_KEY = os.getenv("SERPAPI_KEY")
+            if not SERPAPI_KEY:
+                return JsonResponse({"error": "Falta la clave SERPAPI_KEY en el archivo .env"}, status=500)
+
+            search = GoogleSearch({
+                "q": f"turismo en {ciudad} {pais} {evento} {', '.join(intereses)} 2025 actividades lugares recomendados",
+                "api_key": SERPAPI_KEY,
+                "num": 5
+            })
+            results = search.get_dict()
+
+            resumen_web = ""
+            if "organic_results" in results:
+                for r in results["organic_results"][:5]:
+                    title = r.get("title", "")
+                    snippet = r.get("snippet", "")
+                    link = r.get("link", "")
+                    resumen_web += f"\n- {title}: {snippet}\n{link}\n"
+
+            prompt_final = (
+                "Usa la siguiente información web reciente para construir una respuesta turística completa:\n"
+                f"{resumen_web}\n\n"
+                f"Solicitud del usuario:\n{prompt_usuario}"
+            )
+
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "Eres un asistente experto en turismo colombiano."},
+                    {"role": "user", "content": prompt_final},
+                ],
+                max_tokens=2000,
+                temperature=0.7
+            )
+
+            resultado = response.choices[0].message.content
+
             Route.objects.create(
                 user=request.user,
                 city=ciudad,
@@ -374,11 +375,14 @@ def generar_ruta_ai(request):
                 budget=presupuesto,
                 ai_response=resultado
             )
-        except Exception as e:
-            print(f"Error al guardar la ruta: {e}")
-            # Continuar aunque falle el guardado
 
-        return JsonResponse({"respuesta": resultado})
+            return JsonResponse({"respuesta": resultado})
+
+        except Exception as e:
+            print(f"Error en generar_ruta_ai: {str(e)}")
+            return JsonResponse({
+                "error": f"No se pudo generar la ruta: {str(e)}"
+            }, status=500)
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
