@@ -1,7 +1,301 @@
 {% extends 'core/base.html' %}
-
+{% load static %}
 
 {% block title %}Dashboard — Akua{% endblock %}
+
 {% block content %}
-<div class="mx-auto max-w-6xl px-4 py-8"><h1 class="text-2xl font-bold mb-4">Dashboard</h1><div class="grid md:grid-cols-3 gap-6"><section class="bg-white border rounded-2xl p-4 shadow-card"><h2 class="font-semibold mb-3">Your Routes</h2><ul class="space-y-2 text-sm">{% for r in routes %}<li class="flex items-center justify-between border rounded-lg p-2"><span>{{ r.origin }} → {{ r.destination }}</span><span class="text-gray-500">{{ r.estimated_time }} h</span></li>{% empty %}<li class="text-gray-500">No routes yet.</li>{% endfor %}</ul></section><section class="md:col-span-2 bg-white border rounded-2xl p-4 shadow-card"><h2 class="font-semibold mb-3">Favorite Places</h2><div class="grid sm:grid-cols-2 gap-4">{% for p in favorites %}<article class="border rounded-2xl p-3"><div class="font-medium">{{ p.name }}</div><div class="text-sm text-gray-500">{{ p.type|title }} • ${{ p.cost }}</div></article>{% empty %}<div class="text-gray-500">No favorites yet.</div>{% endfor %}</div></section></div></div>
+<div class="container py-5">
+  <div class="mb-4">
+    <h1 class="display-5 fw-bold mb-2" style="
+      background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    ">
+      <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </h1>
+    <p class="text-muted">Resumen de tus viajes y experiencias</p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Your Routes -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid #F06B43 !important;">
+        <div class="card-body">
+          <h5 class="fw-semibold mb-4 d-flex align-items-center">
+            <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 36px;
+              height: 36px;
+              background: linear-gradient(135deg, #F04D43, #F06B43);
+              color: white;
+            ">
+              <i class="bi bi-map-fill"></i>
+            </span>
+            Your Routes
+          </h5>
+
+          {% if routes %}
+            <div class="list-group list-group-flush">
+              {% for route in routes %}
+                <div class="list-group-item px-0 border-0 border-bottom">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 class="mb-1 fw-semibold" style="color: #2c3e50;">
+                        <i class="bi bi-geo-alt-fill me-1" style="color: #F06B43;"></i>
+                        {{ route.city }}, {{ route.country }}
+                      </h6>
+                      <small class="text-muted">
+                        <i class="bi bi-calendar3 me-1"></i>{{ route.days }} días
+                        <span class="mx-1">•</span>
+                        <i class="bi bi-wallet2 me-1"></i>{{ route.budget }}
+                      </small>
+                    </div>
+                    <small class="text-muted">{{ route.created_at|date:"d/m/Y" }}</small>
+                  </div>
+                  
+                  <!-- Solo 1 botón: Ver detalles -->
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            onclick="showRouteDetails('{{ route.city }}', '{{ route.country }}', '{{ route.days }}', '{{ route.budget }}', '{{ route.ai_response|escapejs }}')"
+                            style="border-color: #F06B43; color: #F06B43;">
+                      <i class="bi bi-eye me-1"></i>Ver detalles
+                    </button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <a href="{% url 'donde_ir' %}" class="btn btn-akua w-100 mt-3 rounded-pill">
+              <i class="bi bi-plus-circle me-2"></i>Generar nueva ruta
+            </a>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-map" style="font-size: 3rem; color: #dee2e6;"></i>
+              <p class="text-muted mt-3 mb-4">No has generado ninguna ruta aún</p>
+              <a href="{% url 'donde_ir' %}" class="btn btn-akua rounded-pill">
+                <i class="bi bi-magic me-2"></i>Generar mi primera ruta
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Places Visited -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid #F08A43 !important;">
+        <div class="card-body">
+          <h5 class="fw-semibold mb-4 d-flex align-items-center">
+            <span class="me-2 d-flex align-items-center justify-content-center rounded-circle" style="
+              width: 36px;
+              height: 36px;
+              background: linear-gradient(135deg, #F08A43, #F0A843);
+              color: white;
+            ">
+              <i class="bi bi-pin-map-fill"></i>
+            </span>
+            Places Visited
+          </h5>
+
+          {% if visited_places %}
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              {% for place in visited_places %}
+                <span class="badge rounded-pill px-3 py-2" style="
+                  background: linear-gradient(135deg, rgba(240, 107, 67, 0.1), rgba(240, 138, 67, 0.1));
+                  color: #F04D43;
+                  border: 1px solid rgba(240, 107, 67, 0.3);
+                  font-weight: 500;
+                ">
+                  <i class="bi bi-geo-fill me-1"></i>{{ place }}
+                </span>
+              {% endfor %}
+            </div>
+            
+            <div class="d-flex gap-2 mt-3">
+              <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                <i class="bi bi-pencil me-1"></i>Editar en perfil
+              </a>
+              <a href="{% url 'write_review' %}" class="btn btn-sm btn-akua rounded-pill">
+                <i class="bi bi-star me-1"></i>Escribir reseña
+              </a>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-pin-map" style="font-size: 3rem; color: #dee2e6;"></i>
+              <p class="text-muted mt-3 mb-4">No has visitado ningún lugar aún</p>
+              <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'profile' %}" class="btn btn-outline-secondary rounded-pill">
+                  <i class="bi bi-person me-1"></i>Actualizar perfil
+                </a>
+                <a href="{% url 'write_review' %}" class="btn btn-akua rounded-pill">
+                  <i class="bi bi-star me-1"></i>Escribir reseña
+                </a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal mejorado para ver detalles de la ruta -->
+<div class="modal fade" id="routeModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <!-- Header mejorado -->
+      <div class="modal-header" style="
+        background: linear-gradient(135deg, #F04D43 0%, #F06B43 50%, #F08A43 100%);
+        color: white;
+        border: none;
+      ">
+        <div>
+          <h5 class="modal-title fw-bold mb-1">
+            <i class="bi bi-map-fill me-2"></i><span id="routeTitle">Detalles de la Ruta</span>
+          </h5>
+          <small id="routeSubtitle" style="opacity: 0.9;"></small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      
+      <!-- Body mejorado -->
+      <div class="modal-body p-4" id="routeDetails">
+        <!-- Los detalles se cargarán aquí con formato mejorado -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showRouteDetails(city, country, days, budget, aiResponse) {
+  // Actualizar título
+  document.getElementById('routeTitle').textContent = `${city}, ${country}`;
+  document.getElementById('routeSubtitle').textContent = `${days} días • ${budget}`;
+  
+  // Procesar el texto de la IA
+  let formattedText = aiResponse;
+  
+  // Convertir ### en títulos grandes (H3)
+  formattedText = formattedText.replace(/###\s*(.+)/g, '<h3 class="fw-bold mt-4 mb-3" style="color: #F04D43; border-bottom: 3px solid #F06B43; padding-bottom: 10px;"><i class="bi bi-signpost-fill me-2"></i>$1</h3>');
+  
+  // Convertir #### en títulos medianos (H4)
+  formattedText = formattedText.replace(/####\s*(.+)/g, '<h4 class="fw-semibold mt-3 mb-3" style="color: #2c3e50;"><i class="bi bi-calendar-day me-2" style="color: #F08A43;"></i>$1</h4>');
+  
+  // Convertir **texto** en negrita con color
+  formattedText = formattedText.replace(/\*\*(.+?)\*\*/g, '<strong style="color: #F06B43;">$1</strong>');
+  
+  // Convertir líneas que empiezan con - en bullets con íconos
+  formattedText = formattedText.replace(/^-\s+(.+)/gm, '<div class="mb-2 ps-3"><i class="bi bi-arrow-right-circle-fill me-2" style="color: #10b981;"></i>$1</div>');
+  
+  // Convertir saltos de línea en <br>
+  formattedText = formattedText.replace(/\n/g, '<br>');
+  
+  // Agregar cards para mejor organización
+  formattedText = `
+    <div class="route-content" style="line-height: 1.8; color: #495057; font-size: 1.05rem;">
+      ${formattedText}
+    </div>
+  `;
+  
+  document.getElementById('routeDetails').innerHTML = formattedText;
+  
+  // Mostrar modal
+  const modal = new bootstrap.Modal(document.getElementById('routeModal'));
+  modal.show();
+}
+</script>
+
+<style>
+  .btn-akua:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(240, 107, 67, 0.3);
+  }
+  
+  .list-group-item {
+    transition: background-color 0.2s;
+  }
+  
+  .list-group-item:hover {
+    background-color: rgba(240, 107, 67, 0.03);
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: rgba(240, 107, 67, 0.1);
+    border-color: #F04D43;
+    color: #F04D43;
+    transition: all 0.2s ease;
+  }
+  
+  /* Estilos para el modal mejorado */
+  .route-content h3 {
+    animation: fadeInDown 0.5s ease;
+  }
+  
+  .route-content h4 {
+    background: linear-gradient(135deg, rgba(240, 107, 67, 0.05), rgba(240, 138, 67, 0.05));
+    padding: 12px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #F08A43;
+    margin: 20px 0;
+    animation: fadeInLeft 0.5s ease;
+  }
+  
+  .route-content strong {
+    font-weight: 600;
+  }
+  
+  .route-content div {
+    padding-left: 10px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .route-content div:hover {
+    border-left-color: #F06B43;
+    background: rgba(240, 107, 67, 0.02);
+    padding-left: 15px;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Scrollbar personalizado para el modal */
+  .modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #F04D43, #F08A43);
+    border-radius: 10px;
+  }
+  
+  .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #F04D43;
+  }
+</style>
 {% endblock %}

@@ -212,7 +212,7 @@
           <!-- Botones de Acción -->
           <div class="d-grid gap-3 mt-4">
             {% if user.is_authenticated %}
-            <a href="{% url 'donde_ir' %}" class="btn btn-akua rounded-pill py-3 shadow-sm" style="
+            <a href="{% url 'donde_ir' %}?where={% if place.city %}{{ place.city|urlencode }}{% elif place.department %}{{ place.department|urlencode }}{% endif %}" class="btn btn-akua rounded-pill py-3 shadow-sm" style="
               font-weight: 600;
               font-size: 1rem;
             ">

@@ -8,30 +8,32 @@
     <h1 class="display-4 fw-bolder">Use the power of AI to make the most out of your next trip</h1>
 
     <div class="search-pill mt-4 w-100 w-md-75 w-lg-50">
-      <form class="row g-2 align-items-center px-2">
+      <form id="homeSearchForm" class="row g-2 align-items-center px-2">
         <div class="col-12 col-md">
           <small class="text-secondary d-block">Where</small>
-          <input class="form-control border-0 ps-0" placeholder="Search destinations">
+          <input id="whereInput" name="where" class="form-control border-0 ps-0" placeholder="Search destinations">
         </div>
 
         <div class="col-auto d-none d-md-flex align-items-center"><div class="divider"></div></div>
 
         <div class="col-12 col-md">
           <small class="text-secondary d-block">When</small>
-          <input class="form-control border-0 ps-0 js-date" placeholder="Select period">
+          <input id="whenInput" name="when" class="form-control border-0 ps-0 js-date" placeholder="Select period">
         </div>
 
         <div class="col-auto d-none d-md-flex align-items-center"><div class="divider"></div></div>
 
         <div class="col-12 col-md">
           <small class="text-secondary d-block">Type</small>
-          <select class="form-select border-0 ps-0">
-            <option>All</option><option>Nature</option><option>Culture</option>
+          <select id="typeInput" name="type" class="form-select border-0 ps-0">
+            <option value="">All</option>
+            <option value="Nature">Nature</option>
+            <option value="Culture">Culture</option>
           </select>
         </div>
 
         <div class="col-12 col-md-auto">
-          <a href="{% url 'donde_ir' %}" class="btn btn-akua rounded-pill px-4">Browse Trip</a>
+          <button type="submit" class="btn btn-akua rounded-pill px-4">Browse Trip</button>
         </div>
       </form>
     </div>
@@ -39,9 +41,211 @@
 </section>
 
 <section class="section-slope">
-  <div class="container">
-    <h2 class="h4 fw-semibold mb-0">Popular things to do</h2>
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="h4 fw-semibold mb-0">
+        <i class="bi bi-star-fill me-2" style="color: #F0A843;"></i>
+        Top Rated Places in Colombia
+      </h2>
+      
+      <!-- Barra de búsqueda -->
+      <div class="search-box" style="width: 300px;">
+        <input 
+          type="text" 
+          id="searchPlaces" 
+          class="form-control" 
+          placeholder="🔍 Search places..."
+          style="border: 2px solid #e9ecef; border-radius: 25px; padding: 10px 20px;">
+      </div>
+    </div>
+
+    <!-- Grid de lugares -->
+    <div class="row g-4" id="placesGrid">
+      {% for place in top_places %}
+      <div class="col-md-6 col-lg-4 place-card" data-name="{{ place.name|lower }}" data-city="{{ place.city|lower }}" data-category="{{ place.category|lower }}">
+        <div class="card h-100 border-0 shadow-sm" style="transition: all 0.3s ease; overflow: hidden;">
+          <!-- Imagen -->
+          <div style="height: 200px; overflow: hidden; position: relative;">
+            {% if place.photo %}
+              <img src="{{ place.photo.url }}" class="card-img-top" alt="{{ place.name }}" 
+                   style="height: 100%; width: 100%; object-fit: cover; transition: transform 0.3s ease;">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center h-100" 
+                   style="background: linear-gradient(135deg, rgba(240, 77, 67, 0.1), rgba(240, 138, 67, 0.1));">
+                <i class="bi bi-image" style="font-size: 3rem; color: #F06B43;"></i>
+              </div>
+            {% endif %}
+            
+            <!-- Rating badge -->
+            {% if place.rating_average > 0 %}
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge px-3 py-2" style="
+                background: linear-gradient(135deg, #F0A843, #F08A43);
+                font-size: 0.9rem;
+                border-radius: 20px;
+              ">
+                <i class="bi bi-star-fill me-1"></i>{{ place.rating_average }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Contenido -->
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-2" style="color: #2c3e50;">
+              {{ place.name }}
+            </h5>
+            
+            <!-- Ubicación -->
+            <p class="text-muted small mb-2">
+              <i class="bi bi-geo-alt-fill me-1" style="color: #F06B43;"></i>
+              {% if place.city %}{{ place.city }}{% endif %}
+              {% if place.city and place.department %}, {% endif %}
+              {% if place.department %}{{ place.department }}{% endif %}
+            </p>
+            
+            <!-- Descripción -->
+            <p class="card-text text-muted small mb-3" style="
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            ">
+              {{ place.short_description }}
+            </p>
+            
+            <!-- Footer -->
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Categoría -->
+              {% if place.category %}
+              <span class="badge rounded-pill px-3 py-1" style="
+                background-color: rgba(240, 107, 67, 0.1);
+                color: #F04D43;
+                border: 1px solid rgba(240, 107, 67, 0.3);
+              ">
+                {{ place.category }}
+              </span>
+              {% endif %}
+              
+              <!-- Costo -->
+              {% if place.estimated_cost > 0 %}
+              <span class="text-muted small">
+                <i class="bi bi-cash-coin me-1"></i>
+                ${{ place.estimated_cost|floatformat:0 }}
+              </span>
+              {% endif %}
+            </div>
+            
+            <!-- Botón -->
+            <a href="{% url 'place_detail' place.slug %}" 
+               class="btn btn-akua w-100 mt-3 rounded-pill">
+              <i class="bi bi-eye me-2"></i>View Details
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="bi bi-map" style="font-size: 3rem; color: #dee2e6;"></i>
+          <p class="text-muted mt-3">No places found</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Botón ver más -->
+      <div class="text-center mt-5">
+        <a href="{% url 'places' %}" 
+        class="btn btn-outline-light rounded-pill px-5 py-3 fw-semibold"
+        style="
+       border: 3px solid white;
+       color: white;
+       font-size: 1.1rem;
+       transition: all 0.3s ease;
+       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+     "
+        onmouseover="this.style.background='white'; this.style.color='#F06B43';"
+        onmouseout="this.style.background='transparent'; this.style.color='white';">
+        <i class="bi bi-grid-3x3-gap me-2"></i>View All Places
+        </a>
+      </div>
   </div>
 </section>
-{% endblock %}
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Form de búsqueda principal
+  const form = document.getElementById('homeSearchForm');
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const where = document.getElementById('whereInput').value.trim();
+    
+    const params = new URLSearchParams();
+    if (where) params.append('where', where);
+    
+    const url = "{% url 'donde_ir' %}" + (params.toString() ? '?' + params.toString() : '');
+    window.location.href = url;
+  });
+
+  // Búsqueda de lugares en tiempo real
+  const searchInput = document.getElementById('searchPlaces');
+  const placeCards = document.querySelectorAll('.place-card');
+
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+
+    placeCards.forEach(card => {
+      const name = card.getAttribute('data-name');
+      const city = card.getAttribute('data-city');
+      const category = card.getAttribute('data-category');
+
+      // Buscar en nombre, ciudad o categoría
+      if (name.includes(searchTerm) || city.includes(searchTerm) || category.includes(searchTerm)) {
+        card.style.display = 'block';
+        card.classList.add('fade-in');
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+
+<style>
+/* Hover effect en las cards */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(240, 107, 67, 0.2) !important;
+}
+
+.card:hover img {
+  transform: scale(1.1);
+}
+
+/* Animación de fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Estilo para el input de búsqueda */
+#searchPlaces:focus {
+  border-color: #F06B43 !important;
+  box-shadow: 0 0 0 0.2rem rgba(240, 107, 67, 0.15) !important;
+  outline: none;
+}
+</style>
+{% endblock %}
